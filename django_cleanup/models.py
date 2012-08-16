@@ -4,16 +4,15 @@ from django.db.models.signals import pre_save, post_delete
 from django.db.models.loading import cache
 
 
-def get_models_with_files(): 
+def find_models_with_filefield(): 
     result = []
     for app in cache.get_apps():
-        if app.__name__.startswith('django.contrib.'):
-            continue
         model_list = cache.get_models(app)
         for model in model_list:
             for field in model._meta.fields:
                 if isinstance(field, models.FileField):
                     result.append(model)
+                    break
     return result
 
 def remove_old_files(sender, instance, **kwargs):
@@ -43,7 +42,7 @@ def remove_files(sender, instance, **kwargs):
                 pass
 
 
-for model in get_models_with_files():
+for model in find_models_with_filefield():
     pre_save.connect(remove_old_files, sender=model)
     post_delete.connect(remove_files, sender=model)
 

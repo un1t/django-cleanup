@@ -7,20 +7,20 @@
 #
 
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
 
-
-readme = open(os.path.join(os.path.dirname(__file__), 'README.markdown')).read()
 
 setup(
     name     = 'django-cleanup',
-    version  = '0.1',
-    packages = ['django_cleanup'],
-
-    requires = ['python (>= 2.5)', 'django (>= 1.3)'],
+    version  = '0.1.4',
+    packages = find_packages(),
+    include_package_data=True,
+    install_requires = [
+        'django >= 1.3',
+    ],
 
     description  = 'Deletes old files.',
-    long_description = readme,
+    long_description = open('README.markdown').read(), 
     author       = 'Ilya Shalyapin',
     author_email = 'ishalyapin@gmail.com',
     url          = 'https://github.com/un1t/django-cleanup',
