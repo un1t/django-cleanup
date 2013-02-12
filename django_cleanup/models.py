@@ -18,7 +18,12 @@ def find_models_with_filefield():
 def remove_old_files(sender, instance, **kwargs):
     if not instance.id:
         return
-    old_instance = instance.__class__.objects.get(id=instance.id)
+
+    try:
+        old_instance = instance.__class__.objects.get(id=instance.id)
+    except instance.DoesNotExist:
+        return
+
     for field in instance._meta.fields:
         if not isinstance(field, models.FileField):
             continue
