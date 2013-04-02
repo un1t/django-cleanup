@@ -30,24 +30,22 @@ def remove_old_files(sender, instance, **kwargs):
         old_file = getattr(old_instance, field.name)
         new_file = getattr(instance, field.name)
         storage = old_file.storage
-        if old_file and old_file != new_file and storage.exists(old_file.name):
+        if old_file and old_file != new_file and storage and storage.exists(old_file.name):
             try:
                 storage.delete(old_file.name)
-            except OSError, NotImplementedError:
+            except:
                 pass
 
 def remove_files(sender, instance, **kwargs):
-    import pprint
-
     for field in instance._meta.fields:
         if not isinstance(field, models.FileField):
             continue
-        file = getattr(instance, field.name)
-        storage = file.storage
-        if file and storage and storage.exists(file.name):
+        file_to_delete = getattr(instance, field.name)
+        storage = file_to_delete.storage
+        if file_to_delete and storage and storage.exists(file_to_delete.name):
             try:
-                storage.delete(file.name)
-            except OSError, NotImplementedError:
+                storage.delete(file_to_delete.name)
+            except: # handle multiple storage implementations, unpredictable exceptions
                 pass
 
 
