@@ -2,7 +2,7 @@ import os
 from django.db import models
 from django.db.models.signals import pre_save, post_delete
 from django.db.models.loading import cache
-
+from django.core.files.storage import get_storage_class
 
 def find_models_with_filefield(): 
     result = []
@@ -29,21 +29,25 @@ def remove_old_files(sender, instance, **kwargs):
             continue
         old_file = getattr(old_instance, field.name)
         new_file = getattr(instance, field.name)
-        if old_file and old_file != new_file and os.path.exists(old_file.path):
+        storage = old_file.storage
+        if old_file and old_file != new_file and storage.exists(old_file.name):
             try:
-                os.remove(old_file.path)
-            except OSError:
+                storage.delete(old_file.name)
+            except OSError, NotImplementedError:
                 pass
 
 def remove_files(sender, instance, **kwargs):
+    import pprint
+
     for field in instance._meta.fields:
         if not isinstance(field, models.FileField):
             continue
         file = getattr(instance, field.name)
-        if file and os.path.exists(file.path):
+        storage = file.storage
+        if file and storage and storage.exists(file.name):
             try:
-                os.remove(file.path)
-            except OSError:
+                storage.delete(file.name)
+            except OSError, NotImplementedError:
                 pass
 
 
