@@ -1,8 +1,11 @@
 import os
+import logging
 from django.db import models
 from django.db.models.signals import pre_save, post_delete
 from django.db.models.loading import cache
 from django.core.files.storage import get_storage_class
+
+logger = logging.getLogger(__name__)
 
 def find_models_with_filefield(): 
     result = []
@@ -34,7 +37,7 @@ def remove_old_files(sender, instance, **kwargs):
             try:
                 storage.delete(old_file.name)
             except:
-                pass
+                logger.exception("Unexpected exception while attempting to delete old file '%s'" % old_file.name)
 
 def remove_files(sender, instance, **kwargs):
     for field in instance._meta.fields:
@@ -45,8 +48,8 @@ def remove_files(sender, instance, **kwargs):
         if file_to_delete and storage and storage.exists(file_to_delete.name):
             try:
                 storage.delete(file_to_delete.name)
-            except: # handle multiple storage implementations, unpredictable exceptions
-                pass
+            except:
+                logger.exception("Unexpected exception while attempting to delete file '%s'" % file_to_delete.name)
 
 
 for model in find_models_with_filefield():
