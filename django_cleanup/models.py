@@ -36,7 +36,7 @@ def remove_old_files(sender, instance, **kwargs):
         if old_file and old_file != new_file and storage and storage.exists(old_file.name):
             try:
                 storage.delete(old_file.name)
-            except:
+            except Exception:
                 logger.exception("Unexpected exception while attempting to delete old file '%s'" % old_file.name)
 
 def remove_files(sender, instance, **kwargs):
@@ -48,7 +48,7 @@ def remove_files(sender, instance, **kwargs):
         if file_to_delete and storage and storage.exists(file_to_delete.name):
             try:
                 storage.delete(file_to_delete.name)
-            except:
+            except Exception:
                 logger.exception("Unexpected exception while attempting to delete file '%s'" % file_to_delete.name)
 
 
