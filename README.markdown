@@ -1,6 +1,6 @@
 # django-cleanup
 
-django-cleanup automatically deletes old file for FileField, ImageField and subclasses,
+django-cleanup automatically deletes old file for FileField, ImageField, **[StdImageField](https://github.com/pivotal-energy-solutions/django-stdimage) (also thumbnail deletion/edition)** and subclasses,
 and it also deletes files on models instance deletion.
 
 **Warning! If you use transactions you may lose you files if transaction will rollback. 
@@ -28,4 +28,3 @@ Add django_cleanup to settings.py
     )
 
 **django_cleanup** should be placed after all your apps. (At least after those apps which need to remove files.)
-
