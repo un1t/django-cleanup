@@ -1,7 +1,7 @@
 import os
 import logging
 from django.db import models
-from django.db.models.signals import pre_save, post_delete
+from django.db.models.signals import post_init, pre_save, post_delete
 from django.db.models.loading import cache
 from django.core.files.storage import get_storage_class
 
@@ -18,19 +18,21 @@ def find_models_with_filefield():
                     break
     return result
 
+def save_old_instance(sender, instance, **kwargs):
+    instance._old_instance = dict([(f.name, getattr(instance, f.name))
+                                      for f in instance._meta.local_fields
+                                          if not f.rel and isinstance(f, models.FileField)])
+
 def remove_old_files(sender, instance, **kwargs):
     if not instance.pk:
         return
 
-    try:
-        old_instance = instance.__class__.objects.get(pk=instance.pk)
-    except instance.DoesNotExist:
-        return
+    old_instance = instance._old_instance
 
     for field in instance._meta.fields:
         if not isinstance(field, models.FileField):
             continue
-        old_file = getattr(old_instance, field.name)
+        old_file = old_instance.get(field.name)
         new_file = getattr(instance, field.name)
         storage = old_file.storage
         if old_file and old_file != new_file and storage and storage.exists(old_file.name):
@@ -53,6 +55,7 @@ def remove_files(sender, instance, **kwargs):
 
 
 for model in find_models_with_filefield():
+    post_init.connect(save_old_instance, sender=model)
     pre_save.connect(remove_old_files, sender=model)
     post_delete.connect(remove_files, sender=model)
 
