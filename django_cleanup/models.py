@@ -1,21 +1,19 @@
 import os
 import logging
+import django
 from django.db import models
 from django.db.models.signals import pre_save, post_delete
-from django.db.models.loading import cache
-from django.core.files.storage import get_storage_class
 
 logger = logging.getLogger(__name__)
 
+
 def find_models_with_filefield(): 
     result = []
-    for app in cache.get_apps():
-        model_list = cache.get_models(app)
-        for model in model_list:
-            for field in model._meta.fields:
-                if isinstance(field, models.FileField):
-                    result.append(model)
-                    break
+    for model in models.get_models():
+        for field in model._meta.fields:
+            if isinstance(field, models.FileField):
+                result.append(model)
+                break
     return result
 
 def remove_old_files(sender, instance, **kwargs):
@@ -51,8 +49,11 @@ def remove_files(sender, instance, **kwargs):
             except Exception:
                 logger.exception("Unexpected exception while attempting to delete file '%s'" % file_to_delete.name)
 
+def connect_signals():
+    for model in find_models_with_filefield():
+        pre_save.connect(remove_old_files, sender=model)
+        post_delete.connect(remove_files, sender=model)
 
-for model in find_models_with_filefield():
-    pre_save.connect(remove_old_files, sender=model)
-    post_delete.connect(remove_files, sender=model)
 
+if django.VERSION < (1, 7):
+    connect_signals()
