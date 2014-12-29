@@ -13,11 +13,11 @@ from setuptools import setup, find_packages
 setup(
     name     = 'django-cleanup',
     version  = '0.1.10',
-    packages = find_packages(),
+    packages = ['django_cleanup',],
     include_package_data=True,
     requires = ['python (>= 2.5)', 'django (>= 1.3)'],
     description  = 'Deletes old files.',
-    long_description = open('README.markdown').read(), 
+    long_description = open('README.markdown').read(),
     author       = 'Ilya Shalyapin',
     author_email = 'ishalyapin@gmail.com',
     url          = 'https://github.com/un1t/django-cleanup',
