@@ -4,10 +4,13 @@ import django
 from django.db import models
 from django.db.models.signals import pre_save, post_delete
 
+from .signals import cleanup_pre_delete, cleanup_post_delete
+
+
 logger = logging.getLogger(__name__)
 
 
-def find_models_with_filefield(): 
+def find_models_with_filefield():
     result = []
     for model in models.get_models():
         for field in model._meta.fields:
@@ -30,24 +33,26 @@ def remove_old_files(sender, instance, **kwargs):
             continue
         old_file = getattr(old_instance, field.name)
         new_file = getattr(instance, field.name)
-        storage = old_file.storage
-        if old_file and old_file != new_file and storage and storage.exists(old_file.name):
-            try:
-                storage.delete(old_file.name)
-            except Exception:
-                logger.exception("Unexpected exception while attempting to delete old file '%s'" % old_file.name)
+        if old_file != new_file:
+            delete_file(old_file)
 
 def remove_files(sender, instance, **kwargs):
     for field in instance._meta.fields:
         if not isinstance(field, models.FileField):
             continue
         file_to_delete = getattr(instance, field.name)
-        storage = file_to_delete.storage
-        if file_to_delete and storage and storage.exists(file_to_delete.name):
-            try:
-                storage.delete(file_to_delete.name)
-            except Exception:
-                logger.exception("Unexpected exception while attempting to delete file '%s'" % file_to_delete.name)
+        delete_file(file_to_delete)
+
+def delete_file(file_):
+    storage = file_.storage
+
+    if storage and storage.exists(file_.name):
+        try:
+            cleanup_pre_delete.send(sender=None, file=file_)
+            storage.delete(file_.name)
+            cleanup_post_delete.send(sender=None, file=file_)
+        except Exception:
+            logger.exception("Unexpected exception while attempting to delete file '%s'" % file_.name)
 
 def connect_signals():
     for model in find_models_with_filefield():
