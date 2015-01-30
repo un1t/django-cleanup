@@ -37,6 +37,16 @@ django-cleanup sends the following signals which can be imported from `django_cl
  * `cleanup_pre_delete` just _before_ a file is deleted. Passes a `file` keyword argument.
  * `cleanup_post_delete` just _after_ a file is deleted. Passes a `file` keyword argument.
 
+### Signals example for sorl.thumbnail
+
+    from django_cleanup.signals import cleanup_pre_delete, cleanup_post_delete
+    
+    def sorl_delete(**kwargs):
+        from sorl.thumbnail import delete
+        delete(kwargs['file'])
+    
+    cleanup_pre_delete.connect(sorl_delete)
+
 
 ## License
 
