@@ -47,6 +47,10 @@ django-cleanup sends the following signals which can be imported from `django_cl
     
     cleanup_pre_delete.connect(sorl_delete)
 
+## How to run tests
+
+    ./runtests.py
+
 
 ## License
 
