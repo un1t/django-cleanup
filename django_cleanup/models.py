@@ -44,8 +44,9 @@ def remove_files(sender, instance, **kwargs):
         delete_file(file_to_delete)
 
 def delete_file(file_):
+    if not file_.name:
+        return
     storage = file_.storage
-
     if storage and storage.exists(file_.name):
         try:
             cleanup_pre_delete.send(sender=None, file=file_)
