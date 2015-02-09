@@ -49,6 +49,7 @@ django-cleanup sends the following signals which can be imported from `django_cl
 
 ## How to run tests
 
+    pip install -r django_cleanup/testapp/requirements.txt
     ./runtests.py
 
 

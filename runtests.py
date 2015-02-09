@@ -12,16 +12,9 @@ settings.configure(
     INSTALLED_APPS = (
         'django_cleanup.testapp',
         'django_cleanup',
-    )
+    ),
+    MIDDLEWARE_CLASSES = [],
 )
-
-# setup.py test runner
-def runtests():
-    from django.test.utils import get_runner
-
-    test_runner = get_runner(settings)(verbosity=1, interactive=True, failfast=False)
-    failures = test_runner.run_tests(settings.INSTALLED_APPS)
-    sys.exit(failures)
 
 if __name__ == "__main__":
     from django.core.management import execute_from_command_line
