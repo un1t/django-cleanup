@@ -12,12 +12,12 @@ from setuptools import setup, find_packages
 
 setup(
     name     = 'django-cleanup',
-    version  = '0.1.12',
+    version  = '0.1.13',
     packages = ['django_cleanup'],
     include_package_data=True,
     requires = ['python (>= 2.5)', 'django (>= 1.3)'],
     description  = 'Deletes old files.',
-    long_description = open('README.markdown').read(), 
+    long_description = open('README.rst').read(),
     author       = 'Ilya Shalyapin',
     author_email = 'ishalyapin@gmail.com',
     url          = 'https://github.com/un1t/django-cleanup',
@@ -29,5 +29,9 @@ setup(
         'Framework :: Django',
         'Intended Audience :: Developers',
         'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.4',
     ],
 )

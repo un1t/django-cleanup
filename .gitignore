@@ -1,3 +1,3 @@
-build/
-dist/
-*.egg-info/
+*.pyc
+*.egg-info
+.tox

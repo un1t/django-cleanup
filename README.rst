@@ -1,5 +1,3 @@
-# django-cleanup
-
 django-cleanup automatically deletes old file for FileField, ImageField and subclasses,
 and it also deletes files on models instance deletion.
 
@@ -8,19 +6,29 @@ If you are concerned about it you need other solution for old file deletion in y
 
 Most django projects I've seen don't use transactions and this app is designed for such projects.
 
-## How does it work?
+Features
+========
+
+- Support for Django 1.3, 1.4, 1.5, 1.6 and 1.7
+- Python 3 support
+
+
+How does it work?
+=================
 
 django-cleanup connects pre_save and post_delete signals to special functions(these functions
 delete old files) for each model which app is listed in INSTALLED_APPS above than 'django_cleanup'.
 
-## Installation
+Installation
+============
 
     pip install django-cleanup
 
 
-## Configuration
+Configuration
+=============
 
-Add django_cleanup to settings.py
+Add django_cleanup to settings.py ::
 
     INSTALLED_APPS = (
         ...
@@ -30,14 +38,17 @@ Add django_cleanup to settings.py
 **django_cleanup** should be placed after all your apps. (At least after those apps which need to remove files.)
 
 
-## Signals
+Signals
+=======
 
 django-cleanup sends the following signals which can be imported from `django_cleanup.signals`:
 
- * `cleanup_pre_delete` just _before_ a file is deleted. Passes a `file` keyword argument.
- * `cleanup_post_delete` just _after_ a file is deleted. Passes a `file` keyword argument.
+- **cleanup_pre_delete** just before a file is deleted. Passes a `file` keyword argument.
+- **cleanup_post_delete** just after a file is deleted. Passes a `file` keyword argument.
 
-### Signals example for sorl.thumbnail
+Signals example for sorl.thumbnail
+----------------------------------
+::
 
     from django_cleanup.signals import cleanup_pre_delete, cleanup_post_delete
     
@@ -47,13 +58,14 @@ django-cleanup sends the following signals which can be imported from `django_cl
     
     cleanup_pre_delete.connect(sorl_delete)
 
-## How to run tests
+How to run tests
+================
 
-    pip install -r django_cleanup/testapp/requirements.txt
-    ./runtests.py
+    tox
 
 
-## License
+License
+=======
 
 django-cleanup is free software under terms of the MIT License.
 

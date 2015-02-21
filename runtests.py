@@ -14,6 +14,13 @@ settings.configure(
         'django_cleanup',
     ),
     MIDDLEWARE_CLASSES = [],
+    TEST_RUNNER = 'django_nose.NoseTestSuiteRunner',
+    NOSE_ARGS = [
+        '--with-spec',
+        '--spec-color',
+        '--verbosity=2',
+        '--nocapture',
+    ],
 )
 
 if __name__ == "__main__":
