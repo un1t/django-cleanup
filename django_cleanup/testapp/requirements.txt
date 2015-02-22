@@ -1,4 +1,5 @@
 django>1.7,<1.8
-django-nose
-pinocchio
 flexmock
+pytest
+pytest-django
+pytest-pythonpath
