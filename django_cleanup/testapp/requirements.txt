@@ -3,3 +3,4 @@ flexmock
 pytest
 pytest-django
 pytest-pythonpath
+pytest-cov
