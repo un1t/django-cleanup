@@ -13,6 +13,7 @@ INSTALLED_APPS = (
     'django_cleanup.testapp',
     'django_cleanup',
     'sorl.thumbnail',
+    'easy_thumbnails',
 )
 
 MIDDLEWARE_CLASSES = []

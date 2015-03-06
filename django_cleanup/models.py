@@ -51,13 +51,13 @@ def delete_file(file_):
         return
     storage = file_.storage
     if storage and storage.exists(file_.name):
+        cleanup_pre_delete.send(sender=None, file=file_)
         try:
-            cleanup_pre_delete.send(sender=None, file=file_)
-            storage.delete(file_.name)
-            cleanup_post_delete.send(sender=None, file=file_)
+            file_.delete(save=False)
         except Exception:
             logger.exception(
                 "Unexpected exception while attempting to delete file '%s'" % file_.name)
+        cleanup_post_delete.send(sender=None, file=file_)
 
 
 def connect_signals():
