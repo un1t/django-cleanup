@@ -48,17 +48,5 @@ def test_remove_blank_file():
 
 @pytest.mark.django_db
 def test_remove_not_exists():
-    product = Product.objects.create(image='no-such-file.png')
-    flexmock(product.image.storage).should_receive('exists').and_return(False).once()
-    flexmock(product.image.storage).should_call('delete').times(0)
-    product.delete()
-
-
-@pytest.mark.django_db
-def test_signals():
-    product = Product.objects.create(image='123.png')
-    flexmock(product.image.storage).should_receive('exists').and_return(True).once().ordered()
-    flexmock(cleanup_pre_delete).should_call('send').once().ordered()
-    flexmock(product.image.storage).should_call('delete').once().ordered()
-    flexmock(cleanup_post_delete).should_call('send').once().ordered()
+    product = Product.objects.create(image='no-such-file')
     product.delete()

@@ -2,7 +2,7 @@ import os
 import logging
 import django
 from django.db import models
-from django.db.models.signals import pre_save, post_delete
+from django.db.models.signals import pre_save, post_save, pre_delete, post_delete
 
 from .signals import cleanup_pre_delete, cleanup_post_delete
 
@@ -19,7 +19,8 @@ def find_models_with_filefield():
                 break
     return result
 
-def remove_old_files(sender, instance, **kwargs):
+
+def attach_old_files(sender, instance, **kwargs):
     if not instance.pk:
         return
 
@@ -32,32 +33,35 @@ def remove_old_files(sender, instance, **kwargs):
         if not isinstance(field, models.FileField):
             continue
         old_file = getattr(old_instance, field.name)
+        setattr(instance, '_old_' + field.name, old_file)
+
+
+def remove_old_files(sender, instance, **kwargs):
+    if not instance.pk:
+        return
+
+    for field in instance._meta.fields:
+        if not isinstance(field, models.FileField):
+            continue
+        old_file = getattr(instance, '_old_' + field.name, None)
         new_file = getattr(instance, field.name)
-        if old_file != new_file:
-            delete_file(old_file)
+        if old_file and old_file != new_file:
+            old_file.delete()
+
 
 def remove_files(sender, instance, **kwargs):
     for field in instance._meta.fields:
         if not isinstance(field, models.FileField):
             continue
         file_to_delete = getattr(instance, field.name)
-        delete_file(file_to_delete)
+        file_to_delete.delete()
 
-def delete_file(file_):
-    if not file_.name:
-        return
-    storage = file_.storage
-    if storage and storage.exists(file_.name):
-        try:
-            cleanup_pre_delete.send(sender=None, file=file_)
-            storage.delete(file_.name)
-            cleanup_post_delete.send(sender=None, file=file_)
-        except Exception:
-            logger.exception("Unexpected exception while attempting to delete file '%s'" % file_.name)
 
 def connect_signals():
     for model in find_models_with_filefield():
-        pre_save.connect(remove_old_files, sender=model)
+        pre_save.connect(attach_old_files, sender=model)
+        post_save.connect(remove_old_files, sender=model)
+        pre_delete.connect(attach_old_files, sender=model)
         post_delete.connect(remove_files, sender=model)
 
 

@@ -11,6 +11,7 @@ Features
 
 - Support for Django 1.3, 1.4, 1.5, 1.6 and 1.7
 - Python 3 support
+- Compatible with sorl-thumbnail and easy-thumbnail
 
 
 How does it work?
@@ -37,26 +38,6 @@ Add django_cleanup to settings.py ::
 
 **django_cleanup** should be placed after all your apps. (At least after those apps which need to remove files.)
 
-
-Signals
-=======
-
-django-cleanup sends the following signals which can be imported from `django_cleanup.signals`:
-
-- **cleanup_pre_delete** just before a file is deleted. Passes a `file` keyword argument.
-- **cleanup_post_delete** just after a file is deleted. Passes a `file` keyword argument.
-
-Signals example for sorl.thumbnail
-----------------------------------
-::
-
-    from django_cleanup.signals import cleanup_pre_delete, cleanup_post_delete
-    
-    def sorl_delete(**kwargs):
-        from sorl.thumbnail import delete
-        delete(kwargs['file'])
-    
-    cleanup_pre_delete.connect(sorl_delete)
 
 How to run tests
 ================
