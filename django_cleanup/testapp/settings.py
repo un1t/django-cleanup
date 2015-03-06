@@ -12,6 +12,7 @@ DATABASES = {
 INSTALLED_APPS = (
     'django_cleanup.testapp',
     'django_cleanup',
+    'sorl.thumbnail',
 )
 
 MIDDLEWARE_CLASSES = []

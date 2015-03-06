@@ -8,11 +8,20 @@ Most django projects I've seen don't use transactions and this app is designed f
 
 Features
 ========
+django-cleanup automatically deletes old file for FileField, ImageField and subclasses,
+and it also deletes files on models instance deletion.
+
+**Warning! If you use transactions you may lose you files if transaction will rollback.
+If you are concerned about it you need other solution for old file deletion in your project.**
+
+Most django projects I've seen don't use transactions and this app is designed for such projects.
+
+Features
+========
 
 - Support for Django 1.3, 1.4, 1.5, 1.6 and 1.7
 - Python 3 support
 - Compatible with sorl-thumbnail and easy-thumbnail
-
 
 How does it work?
 =================
@@ -39,6 +48,26 @@ Add django_cleanup to settings.py ::
 **django_cleanup** should be placed after all your apps. (At least after those apps which need to remove files.)
 
 
+Signals
+=======
+
+django-cleanup sends the following signals which can be imported from `django_cleanup.signals`:
+
+- **cleanup_pre_delete** just before a file is deleted. Passes a `file` keyword argument.
+- **cleanup_post_delete** just after a file is deleted. Passes a `file` keyword argument.
+
+Signals example for sorl.thumbnail
+----------------------------------
+::
+
+    from django_cleanup.signals import cleanup_pre_delete, cleanup_post_delete
+    
+    def sorl_delete(**kwargs):
+        from sorl.thumbnail import delete
+        delete(kwargs['file'])
+    
+    cleanup_pre_delete.connect(sorl_delete)
+
 How to run tests
 ================
 
@@ -57,4 +86,3 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
