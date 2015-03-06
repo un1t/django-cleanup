@@ -1,13 +1,9 @@
 import os
-import logging
 import django
 from django.db import models
 from django.db.models.signals import pre_save, post_delete
 
 from .signals import cleanup_pre_delete, cleanup_post_delete
-
-
-logger = logging.getLogger(__name__)
 
 
 def find_models_with_filefield():
@@ -49,15 +45,9 @@ def remove_files(sender, instance, **kwargs):
 def delete_file(file_):
     if not file_.name:
         return
-    storage = file_.storage
-    if storage and storage.exists(file_.name):
-        cleanup_pre_delete.send(sender=None, file=file_)
-        try:
-            file_.delete(save=False)
-        except Exception:
-            logger.exception(
-                "Unexpected exception while attempting to delete file '%s'" % file_.name)
-        cleanup_post_delete.send(sender=None, file=file_)
+    cleanup_pre_delete.send(sender=None, file=file_)
+    file_.delete(save=False)
+    cleanup_post_delete.send(sender=None, file=file_)
 
 
 def connect_signals():
