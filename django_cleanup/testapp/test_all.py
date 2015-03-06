@@ -13,26 +13,29 @@ def pic1():
     src = os.path.join(settings.MEDIA_ROOT, 'pic.jpg')
     dst = os.path.join(settings.MEDIA_ROOT, 'pic1.jpg')
     shutil.copyfile(src, dst)
-    yield dst
+    yield {
+        'path': dst,
+        'filename': os.path.split(dst)[-1]
+    }
     if os.path.exists(dst):
         os.remove(dst)
 
 
 @pytest.mark.django_db
 def test_replace_file(pic1):
-    product = Product.objects.create(image='pic1.jpg')
-    assert os.path.exists(pic1)
+    product = Product.objects.create(image=pic1['filename'])
+    assert os.path.exists(pic1['path'])
     product.image = 'new.jpg'
     product.save()
-    assert not os.path.exists(pic1)
+    assert not os.path.exists(pic1['path'])
 
 
 @pytest.mark.django_db
 def test_remove_model_instance(pic1):
-    product = Product.objects.create(image='pic1.jpg')
-    assert os.path.exists(pic1)
+    product = Product.objects.create(image=pic1['filename'])
+    assert os.path.exists(pic1['path'])
     product.delete()
-    assert not os.path.exists(pic1)
+    assert not os.path.exists(pic1['path'])
 
 
 @pytest.mark.django_db
