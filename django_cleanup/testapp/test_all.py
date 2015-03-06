@@ -1,24 +1,39 @@
 # coding: utf-8
+import os
+import shutil
 import pytest
 from flexmock import flexmock
-from .models import Product
+from django.conf import settings
 from django_cleanup.signals import cleanup_pre_delete, cleanup_post_delete
+from .models import Product
+
+
+@pytest.yield_fixture
+def pic1():
+    src = os.path.join(settings.MEDIA_ROOT, 'pic.jpg')
+    dst = os.path.join(settings.MEDIA_ROOT, 'pic1.jpg')
+    shutil.copyfile(src, dst)
+    yield dst
+    if os.path.exists(dst):
+        os.remove(dst)
 
 
 @pytest.mark.django_db
-def test_replace_file():
-    product = Product.objects.create(image='123.png')
-    flexmock(product.image.storage).should_receive('exists').and_return(True).once()
-    flexmock(product.image.storage).should_call('delete').with_args('123.png').once()
-    product.image = 'new.png'
+def test_replace_file(pic1):
+    product = Product.objects.create(image='pic1.jpg')
+    assert os.path.exists(pic1)
+    product.image = 'new.jpg'
     product.save()
+    assert not os.path.exists(pic1)
+
 
 @pytest.mark.django_db
-def test_remove_model_instance():
-    product = Product.objects.create(image='123.png')
-    flexmock(product.image.storage).should_receive('exists').and_return(True).once()
-    flexmock(product.image.storage).should_call('delete').with_args('123.png').once()
+def test_remove_model_instance(pic1):
+    product = Product.objects.create(image='pic1.jpg')
+    assert os.path.exists(pic1)
     product.delete()
+    assert not os.path.exists(pic1)
+
 
 @pytest.mark.django_db
 def test_remove_blank_file():
@@ -27,12 +42,14 @@ def test_remove_blank_file():
     flexmock(product.image.storage).should_call('delete').times(0)
     product.delete()
 
+
 @pytest.mark.django_db
 def test_remove_not_exists():
     product = Product.objects.create(image='no-such-file.png')
     flexmock(product.image.storage).should_receive('exists').and_return(False).once()
     flexmock(product.image.storage).should_call('delete').times(0)
     product.delete()
+
 
 @pytest.mark.django_db
 def test_signals():
