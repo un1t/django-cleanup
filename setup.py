@@ -12,7 +12,7 @@ from setuptools import setup, find_packages
 
 setup(
     name     = 'django-cleanup',
-    version  = '0.2.0',
+    version  = '0.2.1',
     packages = ['django_cleanup'],
     include_package_data=True,
     requires = ['python (>= 2.5)', 'django (>= 1.3)'],
