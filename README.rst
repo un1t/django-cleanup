@@ -19,7 +19,7 @@ Most django projects I've seen don't use transactions and this app is designed f
 Features
 ========
 
-- Support for Django 1.3, 1.4, 1.5, 1.6 and 1.7
+- Support for Django 1.3, 1.4, 1.5, 1.6, 1.7 and 1.8
 - Python 3 support
 - Compatible with sorl-thumbnail and easy-thumbnail
 
@@ -61,11 +61,11 @@ Signals example for sorl.thumbnail
 ::
 
     from django_cleanup.signals import cleanup_pre_delete, cleanup_post_delete
-    
+
     def sorl_delete(**kwargs):
         from sorl.thumbnail import delete
         delete(kwargs['file'])
-    
+
     cleanup_pre_delete.connect(sorl_delete)
 
 How to run tests
