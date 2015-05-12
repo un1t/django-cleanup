@@ -19,7 +19,7 @@ Most django projects I've seen don't use transactions and this app is designed f
 Features
 ========
 
-- Support for Django 1.3, 1.4, 1.5, 1.6, 1.7 and 1.8
+- Support for Django 1.7, 1.8
 - Python 3 support
 - Compatible with sorl-thumbnail and easy-thumbnail
 
