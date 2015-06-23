@@ -1,19 +1,31 @@
 import django
 from django.db import models
-from django.apps import apps
 from django.db.models.signals import pre_save, post_delete
 
 from .signals import cleanup_pre_delete, cleanup_post_delete
 
 
-def find_models_with_filefield():
-    result = []
-    for model in apps.get_models():
-        for field in model._meta.fields:
-            if isinstance(field, models.FileField):
-                result.append(model)
-                break
-    return result
+if django.VERSION >= (1, 7):
+
+    from django.apps import apps
+    def find_models_with_filefield():
+        result = []
+        for model in apps.get_models():
+            for field in model._meta.fields:
+                if isinstance(field, models.FileField):
+                    result.append(model)
+                    break
+        return result
+else:
+
+    def find_models_with_filefield():
+        result = []
+        for model in models.get_models():
+            for field in model._meta.fields:
+                if isinstance(field, models.FileField):
+                     result.append(model)
+                     break
+        return result
 
 
 def remove_old_files(sender, instance, **kwargs):
