@@ -1,6 +1,10 @@
 import django
 from django.db import models
-from django.apps import apps
+try:
+    from django.apps import apps
+    get_models = apps.get_models
+except (ImportError, AttributeError):
+    get_models = models.get_models
 from django.db.models.signals import pre_save, post_delete
 
 from .signals import cleanup_pre_delete, cleanup_post_delete
@@ -8,7 +12,7 @@ from .signals import cleanup_pre_delete, cleanup_post_delete
 
 def find_models_with_filefield():
     result = []
-    for model in apps.get_models():
+    for model in get_models():
         for field in model._meta.fields:
             if isinstance(field, models.FileField):
                 result.append(model)

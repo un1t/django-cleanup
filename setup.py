@@ -12,10 +12,10 @@ from setuptools import setup, find_packages
 
 setup(
     name     = 'django-cleanup',
-    version  = '0.3.0',
+    version  = '0.3.1',
     packages = ['django_cleanup'],
     include_package_data=True,
-    requires = ['python (>= 2.5)', 'django (>= 1.3)'],
+    requires = ['python (>= 2.5)', 'django (>= 1.6)'],
     description  = 'Deletes old files.',
     long_description = open('README.rst').read(),
     author       = 'Ilya Shalyapin',

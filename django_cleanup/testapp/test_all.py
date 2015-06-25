@@ -39,10 +39,13 @@ def test_remove_model_instance(pic1):
 
 
 @pytest.mark.django_db
-def test_remove_blank_file():
+def test_remove_blank_file(monkeypatch):
+    def _raise(message):
+        raise Exception(message)
+
     product = Product.objects.create(image='')
-    flexmock(product.image.storage).should_call('exists').times(0)
-    flexmock(product.image.storage).should_call('delete').times(0)
+    monkeypatch.setattr(product.image.storage, 'exists', lambda x: _raise('should not call exists'))
+    monkeypatch.setattr(product.image.storage, 'delete', lambda x: _raise('should not call delete'))
     product.delete()
 
 
