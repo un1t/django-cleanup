@@ -8,16 +8,6 @@ Most django projects I've seen don't use transactions and this app is designed f
 
 Features
 ========
-django-cleanup automatically deletes old file for FileField, ImageField and subclasses,
-and it also deletes files on models instance deletion.
-
-**Warning! If you use transactions you may lose you files if transaction will rollback.
-If you are concerned about it you need other solution for old file deletion in your project.**
-
-Most django projects I've seen don't use transactions and this app is designed for such projects.
-
-Features
-========
 
 - Support for Django 1.6, 1.7, 1.8
 - Python 3 support
