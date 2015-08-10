@@ -26,7 +26,7 @@ def remove_old_files(sender, instance, **kwargs):
 
     try:
         old_instance = instance.__class__.objects.get(pk=instance.pk)
-    except instance.DoesNotExist:
+    except old_instance.DoesNotExist:
         return
 
     for field in instance._meta.fields:
