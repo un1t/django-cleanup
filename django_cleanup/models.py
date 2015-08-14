@@ -1,5 +1,7 @@
 import django
 from django.db import models
+from django.core.exceptions import ObjectDoesNotExist
+
 try:
     from django.apps import apps
     get_models = apps.get_models
@@ -26,7 +28,7 @@ def remove_old_files(sender, instance, **kwargs):
 
     try:
         old_instance = instance.__class__.objects.get(pk=instance.pk)
-    except instance.DoesNotExist:
+    except ObjectDoesNotExist:
         return
 
     for field in instance._meta.fields:
