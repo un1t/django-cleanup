@@ -2,7 +2,7 @@ django-cleanup automatically deletes files for FileField, ImageField, and
 subclasses. It will delete old files when a new file is being save and it
 will delete files on model instance deletion.
 
-**Warning! If you use transactions you may lose files if a transaction will
+**Warning!** If you use transactions you may lose files if a transaction will
 rollback at the right instance. Though this outcome is reduced by our use of
 post_save and post_delete signals, this outcome will still occur if there are
 errors in signals that are handled after our signals are handled. In this case
