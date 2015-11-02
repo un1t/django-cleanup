@@ -41,6 +41,9 @@ def test_replace_file(pic1):
     with transaction.atomic(get_using(product)):
         product.save()
     assert not os.path.exists(pic1['path'])
+    assert product.image
+    new_image_path = os.path.join(settings.MEDIA_ROOT, 'new.jpg')
+    assert product.image.path == new_image_path
 
 
 @pytest.mark.django_db(transaction=True)
