@@ -63,6 +63,8 @@ def delete_old_post_save(sender, instance, raw, created, update_fields, using,
             old_file = getattr(instance, CACHE_NAME)[field_name]
             if old_file != new_file:
                 delete_file(old_file, using)
+                # FieldFile.delete resets FileField in parent instance
+                setattr(instance, field_name, new_file)
 
 
 def delete_all_post_delete(sender, instance, using, **kwargs):
