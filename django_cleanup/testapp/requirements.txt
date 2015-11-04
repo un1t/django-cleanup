@@ -1,7 +1,6 @@
 sorl-thumbnail
 easy-thumbnails
 pillow
-flexmock
 pytest
 pytest-django
 pytest-pythonpath

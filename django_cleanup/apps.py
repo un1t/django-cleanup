@@ -1,12 +1,15 @@
 # coding: utf-8
-import django
-if django.VERSION >= (1, 7):
+'''
+    AppConfig for django-cleanup, prepare the cache and connect signal handlers
+'''
+from django.apps import AppConfig
 
-    from django.apps import AppConfig
-    from .models import connect_signals
+from . import cache, handlers
 
-    class CleanupConfig(AppConfig):
-        name = 'django_cleanup'
 
-        def ready(self):
-            connect_signals()
+class CleanupConfig(AppConfig):
+    name = 'django_cleanup'
+
+    def ready(self):
+        cache.prepare()
+        handlers.connect()
