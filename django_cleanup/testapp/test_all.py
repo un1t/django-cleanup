@@ -2,11 +2,13 @@
 import os
 import shutil
 import pytest
-from flexmock import flexmock
+
+import django
 from django.conf import settings
-from django.db import router
-from django.db import transaction
-from django_cleanup.signals import cleanup_pre_delete, cleanup_post_delete
+from django.db import router, transaction
+from django.utils.six.moves import cPickle as pickle
+from django_cleanup.cache import remove_instance_cache
+from django_cleanup import cleanup
 from .models import Product, ProductProxy, ProductUnmanaged
 
 
@@ -15,7 +17,7 @@ def get_using(instance):
 
 
 def _raise(message):
-    def _func(x):
+    def _func(x):  # pragma: no cover
         raise Exception(message)
     return _func
 
@@ -34,6 +36,43 @@ def pic1():
 
 
 @pytest.mark.django_db(transaction=True)
+@pytest.mark.skipif('django.VERSION < (1,8)')
+def test_refresh_from_db(pic1):
+    product = Product.objects.create(image=pic1['filename'])
+    assert os.path.exists(pic1['path'])
+    product.refresh_from_db()
+    cleanup.refresh(product)
+    assert id(product.image.instance) == id(product)
+    product.image = 'new.jpg'
+    with transaction.atomic(get_using(product)):
+        product.save()
+    assert not os.path.exists(pic1['path'])
+
+
+@pytest.mark.django_db(transaction=True)
+def test_cache_gone(pic1):
+    product = Product.objects.create(image=pic1['filename'])
+    assert os.path.exists(pic1['path'])
+    product.image = 'new.jpg'
+    remove_instance_cache(product)
+    with transaction.atomic(get_using(product)):
+        product.save()
+    assert not os.path.exists(pic1['path'])
+
+
+@pytest.mark.django_db(transaction=True)
+def test_storage_gone(pic1):
+    product = Product.objects.create(image=pic1['filename'])
+    assert os.path.exists(pic1['path'])
+    product.image = 'new.jpg'
+    product = pickle.loads(pickle.dumps(product))
+    assert hasattr(product.image, 'storage')
+    with transaction.atomic(get_using(product)):
+        product.save()
+    assert not os.path.exists(pic1['path'])
+
+
+@pytest.mark.django_db(transaction=True)
 def test_replace_file(pic1):
     product = Product.objects.create(image=pic1['filename'])
     assert os.path.exists(pic1['path'])
@@ -41,6 +80,9 @@ def test_replace_file(pic1):
     with transaction.atomic(get_using(product)):
         product.save()
     assert not os.path.exists(pic1['path'])
+    assert product.image
+    new_image_path = os.path.join(settings.MEDIA_ROOT, 'new.jpg')
+    assert product.image.path == new_image_path
 
 
 @pytest.mark.django_db(transaction=True)

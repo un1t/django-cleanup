@@ -31,7 +31,7 @@ setup(
     version  = find_version('django_cleanup', '__init__.py'),
     packages = ['django_cleanup'],
     include_package_data=True,
-    requires = ['python (>= 2.7)', 'django (>= 1.6)'],
+    requires = ['python (>= 2.7)', 'django (>= 1.7)'],
     description  = 'Deletes old files.',
     long_description = read('README.rst'),
     author       = 'Ilya Shalyapin',

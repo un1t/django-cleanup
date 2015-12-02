@@ -2,33 +2,33 @@ django-cleanup automatically deletes files for FileField, ImageField, and
 subclasses. It will delete old files when a new file is being save and it
 will delete files on model instance deletion.
 
-**Warning!** If you use transactions you may lose files if a transaction will
+**Warning! If you use transactions you may lose files if a transaction will
 rollback at the right instance. Though this outcome is reduced by our use of
 post_save and post_delete signals, this outcome will still occur if there are
 errors in signals that are handled after our signals are handled. In this case
 the old file will be lost and the new file will not be referenced in a model,
 though the new file will likely still exist on disk. If you are concerned about
-it you need another solution for old file deletion in your project.
-
-This is fixed in Django 1.9+ if you are using a database that supports
+it you need another solution for old file deletion in your project. This is fixed in Django 1.9+ if you are using a database that supports
 transactions.**
 
 Features
 ========
 
-- Support for Django 1.6, 1.7, 1.8, 1.9
+- Support for Django 1.7, 1.8, 1.9
 - Python 3 support
 - Compatible with sorl-thumbnail and easy-thumbnail
 
 How does it work?
 =================
 
-django-cleanup connects post_init, post_save, and post_delete signals to special
-functions (these functions delete old files) for each model which app is listed
-in INSTALLED_APPS.
+django-cleanup connects post_init, pre_save, post_save, and post_delete signals
+to signal handlers for each model that has a FileField and which app is listed
+in INSTALLED_APPS. In order to tell whether or not a FileField's value has
+changed a local cache of original values is kept on the model instance.
 
 Installation
 ============
+::
 
     pip install django-cleanup
 
@@ -40,16 +40,8 @@ Add django_cleanup to settings.py ::
 
     INSTALLED_APPS = (
         ...
-        # should go after your apps in django 1.6.
-        # in django 1.7+ this is fixed.
         'django_cleanup',
     )
-
-**django_cleanup** should be placed after all of your apps in django 1.6. (At
-least after those apps which need to remove files.) If you are using django 1.7+
-this is fixed with the new AppConfigs.
-
-
 
 Signals
 =======
@@ -71,8 +63,25 @@ Signals example for sorl.thumbnail
 
     cleanup_pre_delete.connect(sorl_delete)
 
+Refresh from db
+===============
+Django 1.8 introduced the model method **refresh_from_db** which allows one to
+get a fresh copy of data in their model instance. After a call to this method
+you will also need to refresh the cleanup cache on the instance.
+::
+
+    from django_cleanup import cleanup
+
+    ...
+
+    instance.refresh_from_db()
+    cleanup.refresh(instance)
+    ...
+
+
 How to run tests
 ================
+::
 
     tox
 
