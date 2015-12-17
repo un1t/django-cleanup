@@ -180,14 +180,7 @@ def get_field_attr(instance, field_name):
 
 def cleanup_models():
     '''Get all the models we have in the FIELDS cache'''
-    
-    try:
-        keyz = six.viewkeys(FIELDS)
-    except:
-        keyz = six.iterkeys(FIELDS)
-        
-        
-    for model_name in keyz:
+    for model_name in FIELDS:
         yield apps.get_model(model_name)
 
 
