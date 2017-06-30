@@ -1,15 +1,20 @@
 # coding: utf-8
+from __future__ import unicode_literals
+
 import os
 import shutil
-import pytest
 
 import django
 from django.conf import settings
 from django.db import router, transaction
 from django.utils.six.moves import cPickle as pickle
-from django_cleanup.cache import remove_instance_cache
-from django_cleanup import cleanup
-from .models import Product, ProductProxy, ProductUnmanaged
+
+import pytest
+
+from django_cleanup import cache, cleanup
+from django_cleanup.signals import cleanup_pre_delete
+
+from .models import Product, ProductProxy, ProductUnmanaged, sorl_delete
 
 
 def get_using(instance):
@@ -36,7 +41,7 @@ def pic1():
 
 
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.skipif('django.VERSION < (1,8)')
+@pytest.mark.skipif('django.VERSION > (1,9)')
 def test_refresh_from_db(pic1):
     product = Product.objects.create(image=pic1['filename'])
     assert os.path.exists(pic1['path'])
@@ -50,11 +55,24 @@ def test_refresh_from_db(pic1):
 
 
 @pytest.mark.django_db(transaction=True)
+@pytest.mark.skipif('django.VERSION < (1,10)')
+def test_refresh_from_db_without_refresh(pic1):
+    product = Product.objects.create(image=pic1['filename'])
+    assert os.path.exists(pic1['path'])
+    product.refresh_from_db()
+    assert id(product.image.instance) == id(product)
+    product.image = 'new.jpg'
+    with transaction.atomic(get_using(product)):
+        product.save()
+    assert not os.path.exists(pic1['path'])
+
+
+@pytest.mark.django_db(transaction=True)
 def test_cache_gone(pic1):
     product = Product.objects.create(image=pic1['filename'])
     assert os.path.exists(pic1['path'])
     product.image = 'new.jpg'
-    remove_instance_cache(product)
+    cache.remove_instance_cache(product)
     with transaction.atomic(get_using(product)):
         product.save()
     assert not os.path.exists(pic1['path'])
@@ -73,7 +91,7 @@ def test_storage_gone(pic1):
 
 
 @pytest.mark.django_db(transaction=True)
-def test_replace_file(pic1):
+def test_replace_file_with_file(pic1):
     product = Product.objects.create(image=pic1['filename'])
     assert os.path.exists(pic1['path'])
     product.image = 'new.jpg'
@@ -83,6 +101,30 @@ def test_replace_file(pic1):
     assert product.image
     new_image_path = os.path.join(settings.MEDIA_ROOT, 'new.jpg')
     assert product.image.path == new_image_path
+
+
+@pytest.mark.django_db(transaction=True)
+def test_replace_file_with_blank(pic1):
+    product = Product.objects.create(image=pic1['filename'])
+    assert os.path.exists(pic1['path'])
+    product.image = ''
+    with transaction.atomic(get_using(product)):
+        product.save()
+    assert not os.path.exists(pic1['path'])
+    assert not product.image
+    assert product.image.name == ''
+
+
+@pytest.mark.django_db(transaction=True)
+def test_replace_file_with_none(pic1):
+    product = Product.objects.create(image=pic1['filename'])
+    assert os.path.exists(pic1['path'])
+    product.image = None
+    with transaction.atomic(get_using(product)):
+        product.save()
+    assert not os.path.exists(pic1['path'])
+    assert not product.image
+    assert product.image.name is None
 
 
 @pytest.mark.django_db(transaction=True)
@@ -106,7 +148,7 @@ def test_replace_file_unmanaged(pic1):
 
 
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.xfail(reason='https://code.djangoproject.com/ticket/18100')
+@pytest.mark.skipif('django.VERSION < (1,10)', reason='https://code.djangoproject.com/ticket/18100')
 def test_replace_file_deferred(pic1):
     '''probably shouldn't save from a deferred model but someone might do it'''
     product = Product.objects.create(image=pic1['filename'])
@@ -146,7 +188,7 @@ def test_remove_model_instance_unmanaged(pic1):
 
 
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.xfail(reason='https://code.djangoproject.com/ticket/18100')
+@pytest.mark.skipif('django.VERSION < (1,10)', reason='https://code.djangoproject.com/ticket/18100')
 def test_remove_model_instance_deferred(pic1):
     product = Product.objects.create(image=pic1['filename'])
     assert os.path.exists(pic1['path'])
@@ -188,6 +230,7 @@ def test_remove_none(monkeypatch):
 @pytest.mark.django_db(transaction=True)
 def test_sorlthumbnail_replace(pic1):
     # https://github.com/mariocesar/sorl-thumbnail
+    cleanup_pre_delete.connect(sorl_delete)
     from sorl.thumbnail import get_thumbnail
     product = Product.objects.create(sorl_image=pic1['filename'])
     assert os.path.exists(pic1['path'])
@@ -200,11 +243,13 @@ def test_sorlthumbnail_replace(pic1):
         product.save()
     assert not os.path.exists(pic1['path'])
     assert not os.path.exists(thumbnail_path)
+    cleanup_pre_delete.disconnect(sorl_delete)
 
 
 @pytest.mark.django_db(transaction=True)
 def test_sorlthumbnail_delete(pic1):
     # https://github.com/mariocesar/sorl-thumbnail
+    cleanup_pre_delete.connect(sorl_delete)
     from sorl.thumbnail import get_thumbnail
     product = Product.objects.create(sorl_image=pic1['filename'])
     assert os.path.exists(pic1['path'])
@@ -216,6 +261,7 @@ def test_sorlthumbnail_delete(pic1):
         product.delete()
     assert not os.path.exists(pic1['path'])
     assert not os.path.exists(thumbnail_path)
+    cleanup_pre_delete.disconnect(sorl_delete)
 
 
 @pytest.mark.django_db(transaction=True)
@@ -249,3 +295,23 @@ def test_easythumbnails_delete(pic1):
         product.delete()
     assert not os.path.exists(pic1['path'])
     assert not os.path.exists(thumbnail_path)
+
+
+def bool_patch_function(self):
+    return True
+
+
+@pytest.mark.django_db(transaction=True)
+def test_exception_on_save(settings, monkeypatch, pic1):
+    settings.DEFAULT_FILE_STORAGE = 'django_cleanup.testapp.storage.DeleteErrorStorage'
+    product = Product.objects.create(image=pic1['filename'])
+    # simulate a fieldfile that has a bad bool and a storage that raises a
+    # filenotfounderror on delete
+    assert os.path.exists(pic1['path'])
+    product.image.delete(save=False)
+    product.image = None
+    assert not os.path.exists(pic1['path'])
+    monkeypatch.setattr(product.image, '__bool__', bool_patch_function)
+    with transaction.atomic(get_using(product)):
+        product.save()
+    assert not os.path.exists(pic1['path'])

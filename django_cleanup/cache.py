@@ -1,6 +1,8 @@
 # coding: utf-8
 ''' Our local cache of filefields and some workarounds, everything is private to
     this package.'''
+from __future__ import unicode_literals
+
 from collections import defaultdict
 
 from django.apps import apps
@@ -8,11 +10,12 @@ from django.db import models
 from django.utils import six
 from django.utils.module_loading import import_string
 
+
 CACHE_NAME = '_django_cleanup_original_cache'
 
 
 def fields_default():
-    return []
+    return set()
 FIELDS = defaultdict(fields_default)
 
 
@@ -47,7 +50,7 @@ def prepare():
 def add_field_for_model(model_name, field_name, field):
     '''Centralized function to make all our local caches.'''
     # store models that have filefields and the field names
-    FIELDS[model_name].append(field_name)
+    FIELDS[model_name].add(field_name)
     # store the dotted path of the field class for each field
     # in case we need to restore it later on
     FIELDS_FIELDS[model_name][field_name] = get_dotted_path(field)
@@ -79,18 +82,25 @@ def get_field_instance(instance, field_name, using=None):
     '''
     if using is None:
         using = instance
-    field = getattr(instance, field_name, None)
-    field.instance = using
-    return field
+    fieldfile = getattr(instance, field_name, None)
+    # next line fixes the bug in django 1.8, remove when 1.8 dropped
+    fieldfile.instance = using
+    return fieldfile.__class__(using, fieldfile.field, fieldfile.name)
 
 
 # generators ##
 
 
-def get_fields_for_model(model_name):
+def get_fields_for_model(model_name, exclude=None):
     '''Get the filefields for a model if it has them'''
     if model_has_filefields(model_name):
-        for field_name in FIELDS[model_name]:
+        fields = FIELDS[model_name]
+
+        if exclude is not None:
+            assert isinstance(exclude, set)
+            fields = fields.difference(exclude)
+
+        for field_name in fields:
             yield field_name
 
 
@@ -104,9 +114,17 @@ def fields_for_model_instance(instance, using=None):
     if using is None:
         using = instance
     model_name = get_model_name(instance)
-    for field_name in get_fields_for_model(model_name):
-        field = get_field_instance(instance, field_name, using=using)
-        yield field_name, field
+
+    try:
+        # django 1.9 added this API, though only useful in 1.10+ when deferred was fixed
+        # can remove try when 1.8 is deprecated
+        deferred_fields = instance.get_deferred_fields()
+    except AttributeError:
+        deferred_fields = None
+
+    for field_name in get_fields_for_model(model_name, exclude=deferred_fields):
+        fieldfile = get_field_instance(instance, field_name, using=using)
+        yield field_name, fieldfile.__class__(using, fieldfile.field, fieldfile.name)
 
 
 # restore ##

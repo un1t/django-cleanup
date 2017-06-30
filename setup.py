@@ -9,7 +9,8 @@
 import os
 import re
 from codecs import open as codecs_open
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 
 
 def read(*parts):
@@ -27,28 +28,36 @@ def find_version(*parts):
 
 
 setup(
-    name     = 'django-cleanup',
-    version  = find_version('django_cleanup', '__init__.py'),
-    packages = ['django_cleanup'],
+    name='django-cleanup',
+    version=find_version('django_cleanup', '__init__.py'),
+    packages=['django_cleanup'],
     include_package_data=True,
-    requires = ['python (>= 2.7)', 'django (>= 1.7)'],
-    description  = 'Deletes old files.',
-    long_description = read('README.rst'),
-    author       = 'Ilya Shalyapin',
-    author_email = 'ishalyapin@gmail.com',
-    url          = 'https://github.com/un1t/django-cleanup',
-    download_url = 'https://github.com/un1t/django-cleanup/tarball/master',
-    license      = 'MIT License',
-    keywords     = 'django',
-    classifiers  = [
+    requires=['python (>= 2.7)', 'django (>= 1.7)'],
+    description='Deletes old files.',
+    long_description=read('README.rst'),
+    author='Ilya Shalyapin',
+    author_email='ishalyapin@gmail.com',
+    url='https://github.com/un1t/django-cleanup',
+    download_url='https://github.com/un1t/django-cleanup/tarball/master',
+    license='MIT License',
+    keywords='django',
+    classifiers=[
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Web Environment',
         'Framework :: Django',
+        'Framework :: Django :: 1.8',
+        'Framework :: Django :: 1.10',
+        'Framework :: Django :: 1.11',
         'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Topic :: Utilities',
     ],
 )

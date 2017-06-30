@@ -2,16 +2,24 @@
 '''
     Signal handlers to manage FileField files.
 '''
+from __future__ import unicode_literals
+
+import logging
+
+from django.db.models.signals import post_delete, post_init, post_save, pre_save
+
+from . import cache
+from .signals import cleanup_post_delete, cleanup_pre_delete
+
+
 try:
     from django.db.transaction import on_commit
 except ImportError:
     # remove after django 1.8 is deprecated(which will be awhile since it's LTS)
     def on_commit(func, using=None):
         func()
-from django.db.models.signals import post_init, pre_save, post_save, post_delete
 
-from . import cache
-from .signals import cleanup_pre_delete, cleanup_post_delete
+logger = logging.getLogger(__name__)
 
 
 class FakeInstance(object):
@@ -89,7 +97,13 @@ def delete_file(instance, field_name, file_, using):
     # transactions, otherwise it will run immediately
     def run_on_commit():
         cleanup_pre_delete.send(sender=None, file=file_)
-        file_.delete(save=False)
+        try:
+            file_.delete(save=False)
+        except Exception:
+            opts = instance._meta
+            logger.warning(
+                'There was an exception deleting the file `%s` on field `%s.%s.%s`',
+                file_, opts.app_label, opts.model_name, field_name)
         cleanup_post_delete.send(sender=None, file=file_)
 
     ensure_delete_ready(instance, field_name, file_)

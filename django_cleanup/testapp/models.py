@@ -2,9 +2,9 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from sorl.thumbnail import ImageField
+
 from easy_thumbnails.fields import ThumbnailerImageField
-from django_cleanup.signals import cleanup_pre_delete, cleanup_post_delete
+from sorl.thumbnail import ImageField
 
 
 class ProductAbstract(models.Model):
@@ -36,5 +36,3 @@ class ProductUnmanaged(ProductAbstract):
 def sorl_delete(**kwargs):
     from sorl.thumbnail import delete
     delete(kwargs['file'])
-
-cleanup_pre_delete.connect(sorl_delete)
