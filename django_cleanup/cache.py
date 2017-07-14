@@ -34,13 +34,13 @@ else:
 
 def prepare():
     '''Prepare the cache for all models, non-reentrant'''
-    if len(FIELDS) > 0:
+    if len(FIELDS) > 0:  # pragma: no cover
         return
 
     for model in apps.get_models():
-        opts = ensure_get_fields(model._meta)
+        opts = model._meta
         name = get_model_name(model)
-        if model_has_filefields(name):
+        if model_has_filefields(name):  # pragma: no cover
             return
         for field in opts.get_fields():
             if isinstance(field, models.FileField):
@@ -61,17 +61,6 @@ def add_field_for_model(model_name, field_name, field):
 # work arounds ##
 
 
-def ensure_get_fields(opts):
-    ''' this can be removed when django 1.7 support is dropped'''
-    if hasattr(opts, 'get_fields'):
-        return opts
-
-    def get_fields():
-        return opts.fields
-    opts.get_fields = get_fields
-    return opts
-
-
 def get_field_instance(instance, field_name, using=None):
     '''
         Fieldfile sometimes references the wrong instance, correct this.
@@ -80,7 +69,7 @@ def get_field_instance(instance, field_name, using=None):
         Can use the `using` kwarg to change the instance that the `FieldFile`
         will receive.
     '''
-    if using is None:
+    if using is None:  # pragma: no cover
         using = instance
     fieldfile = getattr(instance, field_name, None)
     # next line fixes the bug in django 1.8, remove when 1.8 dropped
@@ -115,12 +104,7 @@ def fields_for_model_instance(instance, using=None):
         using = instance
     model_name = get_model_name(instance)
 
-    try:
-        # django 1.9 added this API, though only useful in 1.10+ when deferred was fixed
-        # can remove try when 1.8 is deprecated
-        deferred_fields = instance.get_deferred_fields()
-    except AttributeError:
-        deferred_fields = None
+    deferred_fields = instance.get_deferred_fields()
 
     for field_name in get_fields_for_model(model_name, exclude=deferred_fields):
         fieldfile = get_field_instance(instance, field_name, using=using)

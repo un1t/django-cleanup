@@ -3,3 +3,4 @@
 .tox
 .coverage
 .cache
+.pypirc

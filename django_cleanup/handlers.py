@@ -54,13 +54,13 @@ def cache_original_post_init(sender, instance, **kwargs):
 
 def fallback_pre_save(sender, instance, raw, update_fields, using, **kwargs):
     '''Fallback to the database to remake the cleanup cache if there is none'''
-    if raw:
+    if raw:  # pragma: no cover
         return
 
     if instance.pk and not cache.has_cache(instance):
         try:
             db_instance = sender.objects.get(pk=instance.pk)
-        except sender.DoesNotExist:
+        except sender.DoesNotExist:  # pragma: no cover
             return
         cache.make_cleanup_cache(instance, source=db_instance)
 

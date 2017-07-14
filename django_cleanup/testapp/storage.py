@@ -7,10 +7,9 @@ from django.core.files.storage import FileSystemStorage
 
 class DeleteErrorStorage(FileSystemStorage):
     def delete(self, name):
-        ''' delete modified to reraise FileNotFoundError '''
+        ''' delete modified to not catch FileNotFoundError
+            does not support deleting directories
+        '''
         name = self.path(name)
         # If the file or directory exists, delete it from the filesystem.
-        if os.path.isdir(name):
-            os.rmdir(name)
-        else:
-            os.remove(name)
+        os.remove(name)

@@ -297,21 +297,15 @@ def test_easythumbnails_delete(pic1):
     assert not os.path.exists(thumbnail_path)
 
 
-def bool_patch_function(self):
-    return True
-
-
 @pytest.mark.django_db(transaction=True)
-def test_exception_on_save(settings, monkeypatch, pic1):
+def test_exception_on_save(settings, pic1):
     settings.DEFAULT_FILE_STORAGE = 'django_cleanup.testapp.storage.DeleteErrorStorage'
     product = Product.objects.create(image=pic1['filename'])
-    # simulate a fieldfile that has a bad bool and a storage that raises a
-    # filenotfounderror on delete
+    # simulate a fieldfile that has a storage that raises a filenotfounderror on delete
     assert os.path.exists(pic1['path'])
     product.image.delete(save=False)
     product.image = None
     assert not os.path.exists(pic1['path'])
-    monkeypatch.setattr(product.image, '__bool__', bool_patch_function)
     with transaction.atomic(get_using(product)):
         product.save()
     assert not os.path.exists(pic1['path'])
