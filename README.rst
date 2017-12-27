@@ -12,7 +12,7 @@ you are using a database that supports transactions.**
 Features
 ========
 
-- Support for Django 1.8, 1.10, 1.11, 2.0
+- Support for Django 1.8, 1.11, 2.0
 - Python 2.7 and 3.4+ support
 - Compatible with sorl-thumbnail and easy-thumbnail
 
