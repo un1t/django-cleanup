@@ -101,7 +101,7 @@ def delete_file(instance, field_name, file_, using):
             file_.delete(save=False)
         except Exception:
             opts = instance._meta
-            logger.warning(
+            logger.exception(
                 'There was an exception deleting the file `%s` on field `%s.%s.%s`',
                 file_, opts.app_label, opts.model_name, field_name)
         cleanup_post_delete.send(sender=None, file=file_)

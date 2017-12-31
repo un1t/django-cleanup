@@ -1,20 +1,52 @@
 # coding: utf-8
 from __future__ import unicode_literals
 
+import logging
 import os
+import re
 import shutil
 
 import django
 from django.conf import settings
 from django.db import router, transaction
+from django.db.models.fields import files
+from django.utils import six
 from django.utils.six.moves import cPickle as pickle
 
 import pytest
 
-from django_cleanup import cache, cleanup
+from django_cleanup import cache, cleanup, handlers
 from django_cleanup.signals import cleanup_pre_delete
 
+from . import storage
 from .models import Product, ProductProxy, ProductUnmanaged, sorl_delete
+
+
+LINE = re.compile(r'line \d{1,3}')
+
+TB = '''Traceback (most recent call last):
+  File "{handlers}", line xxx, in run_on_commit
+    file_.delete(save=False)
+  File "{files}", line xxx, in delete
+    self.storage.delete(self.name)
+  File "{storage}", line xxx, in delete
+    os.remove(name)
+{error}: [Errno 2] No such file or directory: '{{pic1}}\''''
+
+
+def getTraceback():
+    if six.PY2:
+        fileabspath = lambda x : os.path.abspath(x).replace('.pyc', '.py')
+        error = 'OSError'
+    else:
+        fileabspath = os.path.abspath
+        error = 'FileNotFoundError'
+
+    return TB.format(
+        handlers=fileabspath(handlers.__file__),
+        files=fileabspath(files.__file__),
+        storage=fileabspath(storage.__file__),
+        error=error)
 
 
 def get_using(instance):
@@ -298,7 +330,7 @@ def test_easythumbnails_delete(pic1):
 
 
 @pytest.mark.django_db(transaction=True)
-def test_exception_on_save(settings, pic1):
+def test_exception_on_save(settings, pic1, caplog):
     settings.DEFAULT_FILE_STORAGE = 'django_cleanup.testapp.storage.DeleteErrorStorage'
     product = Product.objects.create(image=pic1['filename'])
     # simulate a fieldfile that has a storage that raises a filenotfounderror on delete
@@ -309,3 +341,13 @@ def test_exception_on_save(settings, pic1):
     with transaction.atomic(get_using(product)):
         product.save()
     assert not os.path.exists(pic1['path'])
+
+    for record in caplog.records:
+        assert LINE.sub('line xxx', record.exc_text) == getTraceback().format(pic1=pic1['path'])
+    assert caplog.record_tuples == [
+        (
+            'django_cleanup.handlers',
+            logging.ERROR,
+            'There was an exception deleting the file `pic1.jpg` on field `testapp.product.image`'
+        )
+    ]
