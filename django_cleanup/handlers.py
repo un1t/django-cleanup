@@ -7,17 +7,10 @@ from __future__ import unicode_literals
 import logging
 
 from django.db.models.signals import post_delete, post_init, post_save, pre_save
+from django.db.transaction import on_commit
 
 from . import cache
 from .signals import cleanup_post_delete, cleanup_pre_delete
-
-
-try:
-    from django.db.transaction import on_commit
-except ImportError:
-    # remove after django 1.8 is deprecated(which will be awhile since it's LTS)
-    def on_commit(func, using=None):
-        func()
 
 logger = logging.getLogger(__name__)
 
@@ -92,7 +85,7 @@ def delete_file(instance, field_name, file_, using):
     if not file_.name:
         return
 
-    # this will run after a successful commit for django 1.9+
+    # this will run after a successful commit
     # assuming you are in a transaction and on a database that supports
     # transactions, otherwise it will run immediately
     def run_on_commit():

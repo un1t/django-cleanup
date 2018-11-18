@@ -5,3 +5,4 @@ pytest
 pytest-django
 pytest-pythonpath
 pytest-cov
+pytest-xdist

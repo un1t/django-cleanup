@@ -3,8 +3,10 @@ from __future__ import unicode_literals
 
 import logging
 import os
+import random
 import re
 import shutil
+import string
 
 import django
 from django.conf import settings
@@ -59,10 +61,15 @@ def _raise(message):
     return _func
 
 
+def random_pic(length=20):
+    return 'pic{}.jpg'.format(
+        ''.join(random.choice(string.ascii_letters) for m in range(length)))
+
+
 @pytest.yield_fixture
 def pic1():
     src = os.path.join(settings.MEDIA_ROOT, 'pic.jpg')
-    dst = os.path.join(settings.MEDIA_ROOT, 'pic1.jpg')
+    dst = os.path.join(settings.MEDIA_ROOT, random_pic())
     shutil.copyfile(src, dst)
     yield {
         'path': dst,
@@ -73,27 +80,12 @@ def pic1():
 
 
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.skipif('django.VERSION > (1,9)')
-def test_refresh_from_db(pic1):
-    product = Product.objects.create(image=pic1['filename'])
-    assert os.path.exists(pic1['path'])
-    product.refresh_from_db()
-    cleanup.refresh(product)
-    assert id(product.image.instance) == id(product)
-    product.image = 'new.jpg'
-    with transaction.atomic(get_using(product)):
-        product.save()
-    assert not os.path.exists(pic1['path'])
-
-
-@pytest.mark.django_db(transaction=True)
-@pytest.mark.skipif('django.VERSION < (1,10)')
 def test_refresh_from_db_without_refresh(pic1):
     product = Product.objects.create(image=pic1['filename'])
     assert os.path.exists(pic1['path'])
     product.refresh_from_db()
     assert id(product.image.instance) == id(product)
-    product.image = 'new.jpg'
+    product.image = random_pic()
     with transaction.atomic(get_using(product)):
         product.save()
     assert not os.path.exists(pic1['path'])
@@ -103,7 +95,7 @@ def test_refresh_from_db_without_refresh(pic1):
 def test_cache_gone(pic1):
     product = Product.objects.create(image=pic1['filename'])
     assert os.path.exists(pic1['path'])
-    product.image = 'new.jpg'
+    product.image = random_pic()
     cache.remove_instance_cache(product)
     with transaction.atomic(get_using(product)):
         product.save()
@@ -114,7 +106,7 @@ def test_cache_gone(pic1):
 def test_storage_gone(pic1):
     product = Product.objects.create(image=pic1['filename'])
     assert os.path.exists(pic1['path'])
-    product.image = 'new.jpg'
+    product.image = random_pic()
     product = pickle.loads(pickle.dumps(product))
     assert hasattr(product.image, 'storage')
     with transaction.atomic(get_using(product)):
@@ -126,12 +118,13 @@ def test_storage_gone(pic1):
 def test_replace_file_with_file(pic1):
     product = Product.objects.create(image=pic1['filename'])
     assert os.path.exists(pic1['path'])
-    product.image = 'new.jpg'
+    randomPic = random_pic()
+    product.image = randomPic
     with transaction.atomic(get_using(product)):
         product.save()
     assert not os.path.exists(pic1['path'])
     assert product.image
-    new_image_path = os.path.join(settings.MEDIA_ROOT, 'new.jpg')
+    new_image_path = os.path.join(settings.MEDIA_ROOT, randomPic)
     assert product.image.path == new_image_path
 
 
@@ -163,7 +156,7 @@ def test_replace_file_with_none(pic1):
 def test_replace_file_proxy(pic1):
     product = ProductProxy.objects.create(image=pic1['filename'])
     assert os.path.exists(pic1['path'])
-    product.image = 'new.jpg'
+    product.image = random_pic()
     with transaction.atomic(get_using(product)):
         product.save()
     assert not os.path.exists(pic1['path'])
@@ -173,20 +166,19 @@ def test_replace_file_proxy(pic1):
 def test_replace_file_unmanaged(pic1):
     product = ProductUnmanaged.objects.create(image=pic1['filename'])
     assert os.path.exists(pic1['path'])
-    product.image = 'new.jpg'
+    product.image = random_pic()
     with transaction.atomic(get_using(product)):
         product.save()
     assert not os.path.exists(pic1['path'])
 
 
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.skipif('django.VERSION < (1,10)', reason='https://code.djangoproject.com/ticket/18100')
 def test_replace_file_deferred(pic1):
     '''probably shouldn't save from a deferred model but someone might do it'''
     product = Product.objects.create(image=pic1['filename'])
     assert os.path.exists(pic1['path'])
     product_deferred = Product.objects.defer('sorl_image').get(id=product.id)
-    product_deferred.image = 'new.jpg'
+    product_deferred.image = random_pic()
     with transaction.atomic(get_using(product)):
         product_deferred.save()
     assert not os.path.exists(pic1['path'])
@@ -220,7 +212,6 @@ def test_remove_model_instance_unmanaged(pic1):
 
 
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.skipif('django.VERSION < (1,10)', reason='https://code.djangoproject.com/ticket/18100')
 def test_remove_model_instance_deferred(pic1):
     product = Product.objects.create(image=pic1['filename'])
     assert os.path.exists(pic1['path'])
@@ -348,6 +339,7 @@ def test_exception_on_save(settings, pic1, caplog):
         (
             'django_cleanup.handlers',
             logging.ERROR,
-            'There was an exception deleting the file `pic1.jpg` on field `testapp.product.image`'
+            'There was an exception deleting the file `{}` on field `testapp.product.image`'.format(
+                pic1['filename'])
         )
     ]

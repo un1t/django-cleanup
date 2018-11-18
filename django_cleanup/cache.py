@@ -1,6 +1,5 @@
 # coding: utf-8
-''' Our local cache of filefields and some workarounds, everything is private to
-    this package.'''
+''' Our local cache of filefields, everything is private to this package.'''
 from __future__ import unicode_literals
 
 from collections import defaultdict
@@ -58,25 +57,6 @@ def add_field_for_model(model_name, field_name, field):
     FIELDS_STORAGE[model_name][field_name] = get_dotted_path(field.storage)
 
 
-# work arounds ##
-
-
-def get_field_instance(instance, field_name, using=None):
-    '''
-        Fieldfile sometimes references the wrong instance, correct this.
-        Used in the `fallback_pre_save` and to fix Django Bug #25547
-
-        Can use the `using` kwarg to change the instance that the `FieldFile`
-        will receive.
-    '''
-    if using is None:  # pragma: no cover
-        using = instance
-    fieldfile = getattr(instance, field_name, None)
-    # next line fixes the bug in django 1.8, remove when 1.8 dropped
-    fieldfile.instance = using
-    return fieldfile.__class__(using, fieldfile.field, fieldfile.name)
-
-
 # generators ##
 
 
@@ -107,7 +87,7 @@ def fields_for_model_instance(instance, using=None):
     deferred_fields = instance.get_deferred_fields()
 
     for field_name in get_fields_for_model(model_name, exclude=deferred_fields):
-        fieldfile = get_field_instance(instance, field_name, using=using)
+        fieldfile = getattr(instance, field_name, None)
         yield field_name, fieldfile.__class__(using, fieldfile.field, fieldfile.name)
 
 
