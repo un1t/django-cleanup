@@ -63,7 +63,7 @@ Signals example for sorl.thumbnail
     cleanup_pre_delete.connect(sorl_delete)
 
 Refresh the cache
-===============
+=================
 Refresh the cleanup cache on the instance.
 ::
 
@@ -82,7 +82,7 @@ How to run tests
     tox
 
 How to write tests
-================
+==================
 This library requires the use of django.test.TransactionTestCase_ when writing tests.
 
 For details on why this is required see
