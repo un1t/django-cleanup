@@ -82,7 +82,7 @@ def delete_all_post_delete(sender, instance, using, **kwargs):
 
 def delete_file(instance, field_name, file_, using):
     '''Deletes a file'''
-    if not file_.name:
+    if not file_.name or file_.name == file_.field.default:
         return
 
     # this will run after a successful commit
