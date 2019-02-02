@@ -82,8 +82,10 @@ def delete_all_post_delete(sender, instance, using, **kwargs):
 
 def delete_file(instance, field_name, file_, using):
     '''Deletes a file'''
-    if not file_.name or file_.name == file_.field.default:
-        return
+    default = file_.field.default if not callable(file_.field.default) else file_.field.default()
+
+    if not file_.name or file_.name == default:
+        return None
 
     # this will run after a successful commit
     # assuming you are in a transaction and on a database that supports
