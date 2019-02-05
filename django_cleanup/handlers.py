@@ -12,32 +12,13 @@ from django.db.transaction import on_commit
 from . import cache
 from .signals import cleanup_post_delete, cleanup_pre_delete
 
+
 logger = logging.getLogger(__name__)
 
 
 class FakeInstance(object):
     '''A Fake model instance to ensure an instance is not modified'''
     pass
-
-
-def ensure_delete_ready(instance, field_name, file_):
-    '''Ensure the file is ready for deletion'''
-
-    # add a fake instance to the file being deleted to avoid
-    # any changes to the real instance.
-    file_.instance = FakeInstance()
-
-    model_name = cache.get_model_name(instance)
-
-    # pickled filefields lose lots of data, and contrary to how it is
-    # documented, the file descriptor does not recover them
-
-    if not hasattr(file_, 'field'):
-        file_.field = cache.get_field(model_name, field_name)()
-        file_.field.name = field_name
-
-    if not hasattr(file_, 'storage'):
-        file_.storage = cache.get_field_storage(model_name, field_name)()
 
 
 def cache_original_post_init(sender, instance, **kwargs):
@@ -82,10 +63,33 @@ def delete_all_post_delete(sender, instance, using, **kwargs):
 
 def delete_file(instance, field_name, file_, using):
     '''Deletes a file'''
+
+    if not file_.name:
+        return
+
+    # add a fake instance to the file being deleted to avoid
+    # any changes to the real instance.
+    file_.instance = FakeInstance()
+
+    # pickled filefields lose lots of data, and contrary to how it is
+    # documented, the file descriptor does not recover them
+
+    model_name = cache.get_model_name(instance)
+
+    # recover the 'field' if necessary
+    if not hasattr(file_, 'field'):
+        file_.field = cache.get_field(model_name, field_name)()
+        file_.field.name = field_name
+
+    # if our file name is default don't delete
     default = file_.field.default if not callable(file_.field.default) else file_.field.default()
 
-    if not file_.name or file_.name == default:
-        return None
+    if file_.name == default:
+        return
+
+    # recover the 'storage' if necessary
+    if not hasattr(file_, 'storage'):
+        file_.storage = cache.get_field_storage(model_name, field_name)()
 
     # this will run after a successful commit
     # assuming you are in a transaction and on a database that supports
@@ -101,7 +105,6 @@ def delete_file(instance, field_name, file_, using):
                 file_, opts.app_label, opts.model_name, field_name)
         cleanup_post_delete.send(sender=None, file=file_)
 
-    ensure_delete_ready(instance, field_name, file_)
     on_commit(run_on_commit, using)
 
 

@@ -73,7 +73,8 @@ def pic1():
     shutil.copyfile(src, dst)
     yield {
         'path': dst,
-        'filename': os.path.split(dst)[-1]
+        'filename': os.path.split(dst)[-1],
+        'srcpath': src
     }
     if os.path.exists(dst):
         os.remove(dst)
@@ -191,6 +192,30 @@ def test_remove_model_instance(pic1):
     with transaction.atomic(get_using(product)):
         product.delete()
     assert not os.path.exists(pic1['path'])
+
+
+@pytest.mark.django_db(transaction=True)
+def test_remove_model_instance_default(pic1):
+    product = Product.objects.create()
+    assert product.image_default == pic1['srcpath']
+    assert product.image_default_callable == pic1['srcpath']
+    assert os.path.exists(pic1['srcpath'])
+    with transaction.atomic(get_using(product)):
+        product.delete()
+    assert os.path.exists(pic1['srcpath'])
+
+
+@pytest.mark.django_db(transaction=True)
+def test_replace_file_with_file_default(pic1):
+    product = Product.objects.create()
+    assert os.path.exists(pic1['srcpath'])
+    randomPic1 = random_pic()
+    randomPic2 = random_pic()
+    product.image_default = randomPic1
+    product.image_default_callable = randomPic2
+    with transaction.atomic(get_using(product)):
+        product.save()
+    assert os.path.exists(pic1['srcpath'])
 
 
 @pytest.mark.django_db(transaction=True)
