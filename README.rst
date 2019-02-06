@@ -19,6 +19,10 @@ Features
 How does it work?
 =================
 
+When a :code:`FileField`'s value is changed and the model is saved, the old file is deleted. When a
+model that has a :code:`FileField` is deleted, the file is also deleted. If the :code:`FileField`'s
+value matches the :code:`FileField`'s default value then the file will not be deleted.
+
 django-cleanup connects :code:`post_init`, :code:`pre_save`, :code:`post_save`, and
 :code:`post_delete` signals to signal handlers for each model that has a :code:`FileField` and which
 app is listed in :code:`INSTALLED_APPS`. In order to tell whether or not a :code:`FileField`'s value

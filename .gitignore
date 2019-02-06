@@ -4,3 +4,7 @@
 .coverage
 .cache
 .pypirc
+.DS_Store
+.python-version
+build/*
+dist/*
