@@ -11,7 +11,7 @@ from django.db.transaction import on_commit
 
 from . import cache
 from .signals import cleanup_post_delete, cleanup_pre_delete
-
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +64,7 @@ def delete_all_post_delete(sender, instance, using, **kwargs):
 def delete_file(instance, field_name, file_, using):
     '''Deletes a file'''
 
-    if not file_.name:
+    if not file_.name or type(instance).__name__ in getattr(settings, 'DJANGO_CLEANUP_IGNORE_MODELS', []):
         return
 
     # add a fake instance to the file being deleted to avoid
