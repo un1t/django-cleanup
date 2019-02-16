@@ -39,8 +39,10 @@ def prepare():
     for model in apps.get_models():
         opts = model._meta
         name = get_model_name(model)
+        if ignore_model(model):
+            continue
         if model_has_filefields(name):  # pragma: no cover
-            return
+            continue
         for field in opts.get_fields():
             if isinstance(field, models.FileField):
                 add_field_for_model(name, field.name, field)
@@ -117,12 +119,22 @@ def get_model_name(model):
     return '{opt.app_label}.{opt.model_name}'.format(opt=model._meta)
 
 
+def get_mangled_ignore(model):
+    '''returns a unique model name'''
+    return '_{opt.model_name}__cleanup_ignore'.format(opt=model._meta)
+
+
 # booleans ##
 
 
 def model_has_filefields(model_name):
     '''Check if a model has filefields'''
     return model_name in FIELDS
+
+
+def ignore_model(model):
+    '''Check if a model should be ignored'''
+    return hasattr(model, get_mangled_ignore(model))
 
 
 # instance functions ##

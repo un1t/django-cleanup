@@ -21,7 +21,7 @@ from django_cleanup import cache, cleanup, handlers
 from django_cleanup.signals import cleanup_pre_delete
 
 from . import storage
-from .models import Product, ProductProxy, ProductUnmanaged, sorl_delete
+from .models import Product, ProductIgnore, ProductProxy, ProductUnmanaged, sorl_delete
 
 
 LINE = re.compile(r'line \d{1,3}')
@@ -216,6 +216,29 @@ def test_replace_file_with_file_default(pic1):
     with transaction.atomic(get_using(product)):
         product.save()
     assert os.path.exists(pic1['srcpath'])
+
+
+@pytest.mark.django_db(transaction=True)
+def test_remove_model_instance_ignore(pic1):
+    product = ProductIgnore.objects.create(image=pic1['filename'])
+    assert os.path.exists(pic1['path'])
+    with transaction.atomic(get_using(product)):
+        product.delete()
+    assert os.path.exists(pic1['path'])
+
+
+@pytest.mark.django_db(transaction=True)
+def test_replace_file_with_file_ignore(pic1):
+    product = ProductIgnore.objects.create(image=pic1['filename'])
+    assert os.path.exists(pic1['path'])
+    randomPic = random_pic()
+    product.image = randomPic
+    with transaction.atomic(get_using(product)):
+        product.save()
+    assert os.path.exists(pic1['path'])
+    assert product.image
+    new_image_path = os.path.join(settings.MEDIA_ROOT, randomPic)
+    assert product.image.path == new_image_path
 
 
 @pytest.mark.django_db(transaction=True)
