@@ -78,7 +78,6 @@ Refresh the cleanup cache on the instance.
     cleanup.refresh(instance)
     ...
 
-
 Ignore cleanup for a specific model
 ===================================
 Ignore a model and do not perform cleanup when the model is deleted or its files change.
@@ -93,8 +92,6 @@ Ignore a model and do not perform cleanup when the model is deleted or its files
         image = models.FileField()
 
     ...
-
-
 
 How to run tests
 ================
