@@ -88,7 +88,7 @@ Ignore a model and do not perform cleanup when the model is deleted or its files
 
     ...
 
-    @cleanup.ignore()
+    @cleanup.ignore
     class MyModel(models.Model):
         image = models.FileField()
 

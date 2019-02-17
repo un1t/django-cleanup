@@ -1,8 +1,8 @@
 '''Public utilities'''
 from __future__ import unicode_literals
 
-from .cache import make_cleanup_cache as _make_cleanup_cache
-from .cache import get_mangled_ignore as _get_mangled_ignore
+from .cache import (
+    get_mangled_ignore as _get_mangled_ignore, make_cleanup_cache as _make_cleanup_cache)
 
 
 __all__ = ['refresh', 'cleanup_ignore']
@@ -14,6 +14,7 @@ def refresh(instance):
 
 
 def ignore(cls):
+    '''Mark a model to ignore for cleanup'''
     setattr(cls, _get_mangled_ignore(cls), None)
     return cls
 cleanup_ignore = ignore

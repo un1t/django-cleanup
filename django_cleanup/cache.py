@@ -33,16 +33,16 @@ else:
 
 def prepare():
     '''Prepare the cache for all models, non-reentrant'''
-    if len(FIELDS) > 0:  # pragma: no cover
+    if FIELDS:  # pragma: no cover
         return
 
     for model in apps.get_models():
-        opts = model._meta
-        name = get_model_name(model)
         if ignore_model(model):
             continue
+        name = get_model_name(model)
         if model_has_filefields(name):  # pragma: no cover
             continue
+        opts = model._meta
         for field in opts.get_fields():
             if isinstance(field, models.FileField):
                 add_field_for_model(name, field.name, field)
@@ -120,8 +120,8 @@ def get_model_name(model):
 
 
 def get_mangled_ignore(model):
-    '''returns a unique model name'''
-    return '_{opt.model_name}__cleanup_ignore'.format(opt=model._meta)
+    '''returns a mangled attribute name specific to the model'''
+    return '_{opt.model_name}__{opt.app_label}_cleanup_ignore'.format(opt=model._meta)
 
 
 # booleans ##
