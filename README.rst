@@ -78,6 +78,20 @@ Refresh the cleanup cache on the instance.
     cleanup.refresh(instance)
     ...
 
+Ignore cleanup for a specific model
+===================================
+Ignore a model and do not perform cleanup when the model is deleted or its files change.
+::
+
+    from django_cleanup import cleanup
+
+    ...
+
+    @cleanup.ignore
+    class MyModel(models.Model):
+        image = models.FileField()
+
+    ...
 
 How to run tests
 ================

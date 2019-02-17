@@ -109,7 +109,7 @@ def delete_file(instance, field_name, file_, using):
 
 
 def connect():
-
+    '''Connect signals to the cleanup models'''
     for model in cache.cleanup_models():
         key = '{{}}_django_cleanup_{}'.format(cache.get_model_name(model))
         post_init.connect(cache_original_post_init, sender=model,
