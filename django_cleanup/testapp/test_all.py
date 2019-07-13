@@ -3,26 +3,23 @@ from __future__ import unicode_literals
 
 import logging
 import os
-import random
 import re
-import shutil
-import string
+import sys
 
-import django
 from django.conf import settings
-from django.db import router, transaction
+from django.db import transaction
 from django.db.models.fields import files
-from django.utils import six
-from django.utils.six.moves import cPickle as pickle
 
 import pytest
 
-from django_cleanup import cache, cleanup, handlers
-from django_cleanup.signals import cleanup_pre_delete
+from django_cleanup import cache, handlers
 
 from . import storage
-from .models import Product, ProductIgnore, ProductProxy, ProductUnmanaged, sorl_delete
+from .models.app import Product, ProductIgnore, ProductProxy, ProductUnmanaged
+from .testing_helpers import get_using, pic1, random_pic
 
+
+PY3 = sys.version_info[0] == 3
 
 LINE = re.compile(r'line \d{1,3}')
 
@@ -35,14 +32,19 @@ TB = '''Traceback (most recent call last):
     os.remove(name)
 {error}: [Errno 2] No such file or directory: '{{pic1}}\''''
 
+if PY3:
+    import pickle
+else:
+    import cPickle as pickle
+
 
 def getTraceback():
-    if six.PY2:
-        fileabspath = lambda x : os.path.abspath(x).replace('.pyc', '.py')
-        error = 'OSError'
-    else:
+    if PY3:
         fileabspath = os.path.abspath
         error = 'FileNotFoundError'
+    else:
+        fileabspath = lambda x: os.path.abspath(x).replace('.pyc', '.py')
+        error = 'OSError'
 
     return TB.format(
         handlers=fileabspath(handlers.__file__),
@@ -51,33 +53,10 @@ def getTraceback():
         error=error)
 
 
-def get_using(instance):
-    return router.db_for_write(instance.__class__, instance=instance)
-
-
 def _raise(message):
     def _func(x):  # pragma: no cover
         raise Exception(message)
     return _func
-
-
-def random_pic(length=20):
-    return 'pic{}.jpg'.format(
-        ''.join(random.choice(string.ascii_letters) for m in range(length)))
-
-
-@pytest.yield_fixture
-def pic1():
-    src = os.path.join(settings.MEDIA_ROOT, 'pic.jpg')
-    dst = os.path.join(settings.MEDIA_ROOT, random_pic())
-    shutil.copyfile(src, dst)
-    yield {
-        'path': dst,
-        'filename': os.path.split(dst)[-1],
-        'srcpath': src
-    }
-    if os.path.exists(dst):
-        os.remove(dst)
 
 
 @pytest.mark.django_db(transaction=True)
@@ -178,7 +157,7 @@ def test_replace_file_deferred(pic1):
     '''probably shouldn't save from a deferred model but someone might do it'''
     product = Product.objects.create(image=pic1['filename'])
     assert os.path.exists(pic1['path'])
-    product_deferred = Product.objects.defer('sorl_image').get(id=product.id)
+    product_deferred = Product.objects.defer('image_default').get(id=product.id)
     product_deferred.image = random_pic()
     with transaction.atomic(get_using(product)):
         product_deferred.save()
@@ -263,7 +242,7 @@ def test_remove_model_instance_unmanaged(pic1):
 def test_remove_model_instance_deferred(pic1):
     product = Product.objects.create(image=pic1['filename'])
     assert os.path.exists(pic1['path'])
-    product_deferred = Product.objects.defer('sorl_image').get(id=product.id)
+    product_deferred = Product.objects.defer('image_default').get(id=product.id)
     with transaction.atomic(get_using(product)):
         product_deferred.delete()
     assert not os.path.exists(pic1['path'])
@@ -296,76 +275,6 @@ def test_remove_none(monkeypatch):
         product.image.storage, 'delete', _raise('should not call delete'))
     with transaction.atomic(get_using(product)):
         product.delete()
-
-
-@pytest.mark.django_db(transaction=True)
-def test_sorlthumbnail_replace(pic1):
-    # https://github.com/mariocesar/sorl-thumbnail
-    cleanup_pre_delete.connect(sorl_delete)
-    from sorl.thumbnail import get_thumbnail
-    product = Product.objects.create(sorl_image=pic1['filename'])
-    assert os.path.exists(pic1['path'])
-    im = get_thumbnail(
-        product.sorl_image, '100x100', crop='center', quality=50)
-    thumbnail_path = os.path.join(settings.MEDIA_ROOT, im.name)
-    assert os.path.exists(thumbnail_path)
-    product.sorl_image = 'new.png'
-    with transaction.atomic(get_using(product)):
-        product.save()
-    assert not os.path.exists(pic1['path'])
-    assert not os.path.exists(thumbnail_path)
-    cleanup_pre_delete.disconnect(sorl_delete)
-
-
-@pytest.mark.django_db(transaction=True)
-def test_sorlthumbnail_delete(pic1):
-    # https://github.com/mariocesar/sorl-thumbnail
-    cleanup_pre_delete.connect(sorl_delete)
-    from sorl.thumbnail import get_thumbnail
-    product = Product.objects.create(sorl_image=pic1['filename'])
-    assert os.path.exists(pic1['path'])
-    im = get_thumbnail(
-        product.sorl_image, '100x100', crop='center', quality=50)
-    thumbnail_path = os.path.join(settings.MEDIA_ROOT, im.name)
-    assert os.path.exists(thumbnail_path)
-    with transaction.atomic(get_using(product)):
-        product.delete()
-    assert not os.path.exists(pic1['path'])
-    assert not os.path.exists(thumbnail_path)
-    cleanup_pre_delete.disconnect(sorl_delete)
-
-
-@pytest.mark.django_db(transaction=True)
-def test_easythumbnails_replace(pic1):
-    # https://github.com/SmileyChris/easy-thumbnails
-    from easy_thumbnails.files import get_thumbnailer
-    product = Product.objects.create(easy_image=pic1['filename'])
-    assert os.path.exists(pic1['path'])
-    im = get_thumbnailer(product.easy_image).get_thumbnail(
-        {'size': (100, 100)})
-    thumbnail_path = os.path.join(settings.MEDIA_ROOT, im.name)
-    assert os.path.exists(thumbnail_path)
-    product.easy_image = 'new.png'
-    with transaction.atomic(get_using(product)):
-        product.save()
-    assert not os.path.exists(pic1['path'])
-    assert not os.path.exists(thumbnail_path)
-
-
-@pytest.mark.django_db(transaction=True)
-def test_easythumbnails_delete(pic1):
-    # https://github.com/SmileyChris/easy-thumbnails
-    from easy_thumbnails.files import get_thumbnailer
-    product = Product.objects.create(easy_image=pic1['filename'])
-    assert os.path.exists(pic1['path'])
-    im = get_thumbnailer(product.easy_image).get_thumbnail(
-        {'size': (100, 100)})
-    thumbnail_path = os.path.join(settings.MEDIA_ROOT, im.name)
-    assert os.path.exists(thumbnail_path)
-    with transaction.atomic(get_using(product)):
-        product.delete()
-    assert not os.path.exists(pic1['path'])
-    assert not os.path.exists(thumbnail_path)
 
 
 @pytest.mark.django_db(transaction=True)

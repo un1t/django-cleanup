@@ -6,5 +6,5 @@
 '''
 from __future__ import unicode_literals
 
-__version__ = '3.2.0'
+__version__ = '4.0.dev0'
 default_app_config = 'django_cleanup.apps.CleanupConfig'

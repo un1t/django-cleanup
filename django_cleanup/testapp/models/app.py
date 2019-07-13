@@ -6,9 +6,6 @@ import os
 from django.conf import settings
 from django.db import models
 
-from easy_thumbnails.fields import ThumbnailerImageField
-from sorl.thumbnail import ImageField
-
 from django_cleanup import cleanup
 from django_cleanup.cleanup import cleanup_ignore
 
@@ -30,8 +27,6 @@ class ProductAbstract(models.Model):
         default=(os.path.join(settings.MEDIA_ROOT, 'pic.jpg')))
     image_default_callable = models.FileField(
         upload_to='testapp', blank=True, null=True, default=default_image)
-    sorl_image = ImageField(upload_to='testapp', blank=True)
-    easy_image = ThumbnailerImageField(upload_to='testapp', blank=True)
 
     class Meta:
         abstract = True
@@ -57,8 +52,3 @@ class ProductUnmanaged(ProductAbstract):
     class Meta:
         managed = False
         db_table = 'testapp_product'
-
-
-def sorl_delete(**kwargs):
-    from sorl.thumbnail import delete
-    delete(kwargs['file'])

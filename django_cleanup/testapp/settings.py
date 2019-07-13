@@ -2,6 +2,8 @@ from __future__ import unicode_literals
 
 import os
 
+import django
+
 
 BASE_DIR = os.path.dirname(__file__)
 
@@ -15,9 +17,21 @@ DATABASES = {
 INSTALLED_APPS = (
     'django_cleanup.testapp',
     'django_cleanup',
+)
+
+INSTALLED_APPS_INTEGRATION = (
     'sorl.thumbnail',
     'easy_thumbnails',
 )
+
+try:
+    import easy_thumbnails.fields
+    import sorl.thumbnail
+except ImportError:
+    pass
+except (django.core.exceptions.AppRegistryNotReady, django.core.exceptions.ImproperlyConfigured):
+    INSTALLED_APPS = INSTALLED_APPS + INSTALLED_APPS_INTEGRATION
+
 
 MIDDLEWARE_CLASSES = []
 

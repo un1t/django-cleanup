@@ -2,11 +2,11 @@
 ''' Our local cache of filefields, everything is private to this package.'''
 from __future__ import unicode_literals
 
+import sys
 from collections import defaultdict
 
 from django.apps import apps
 from django.db import models
-from django.utils import six
 from django.utils.module_loading import import_string
 
 
@@ -22,7 +22,7 @@ def fields_dict_default():
     return {}
 FIELDS_FIELDS = defaultdict(fields_dict_default)
 FIELDS_STORAGE = defaultdict(fields_dict_default)
-if six.PY3:
+if sys.version_info[0] == 3:
     DOTTED_PATH = '{klass.__module__}.{klass.__qualname__}'
 else:
     DOTTED_PATH = '{klass.__module__}.{klass.__name__}'
