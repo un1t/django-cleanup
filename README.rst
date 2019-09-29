@@ -38,8 +38,9 @@ Installation
 
 Configuration
 =============
-Add django_cleanup to settings.py
-::
+Add ``django_cleanup`` to ``settings.py`` after your ``App``
+
+.. code-block:: py
 
     INSTALLED_APPS = (
         ...,
@@ -47,6 +48,28 @@ Add django_cleanup to settings.py
     )
 
 That is all, no other configuration is necessary.
+
+Troubleshooting
+===============
+
+If you notice that ``django-cleanup`` is not removing your files when a ``Model`` is deleted, first
+check that your models are being properly 
+`loaded <https://docs.djangoproject.com/en/stable/ref/applications/#how-applications-are-loaded>`_.
+
+::
+
+    You must define or import all models in your application’s models.py or models/__init__.py. 
+    Otherwise, the application registry may not be fully populated at this point, which could cause 
+    the ORM to malfunction.
+
+If your models are not loaded, ``django-cleanup`` will not be able to discover their ``FileField``'s.
+
+You can check if your ``Model`` is loaded by using
+
+.. code-block:: py
+
+    from django.apps import apps
+    apps.get_models()
 
 Advanced
 ========
@@ -62,7 +85,8 @@ can be imported from :code:`django_cleanup.signals`:
 - :code:`cleanup_post_delete`: just after a file is deleted. Passes a :code:`file` keyword argument.
 
 Signals example for sorl.thumbnail:
-::
+
+.. code-block:: py
 
     from django_cleanup.signals import cleanup_pre_delete
     from sorl.thumbnail import delete
@@ -76,7 +100,8 @@ Refresh the cache
 -----------------
 There have been rare cases where the cache would need to be refreshed. To do so the
 :code:`django_cleanup.cleanup.refresh` method can be used:
-::
+
+.. code-block:: py
 
     from django_cleanup import cleanup
 
@@ -85,7 +110,8 @@ There have been rare cases where the cache would need to be refreshed. To do so 
 Ignore cleanup for a specific model
 -----------------------------------
 Ignore a model and do not perform cleanup when the model is deleted or its files change.
-::
+
+.. code-block:: py
 
     from django_cleanup import cleanup
 
