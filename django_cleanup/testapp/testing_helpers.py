@@ -16,20 +16,22 @@ def get_using(instance):
     return router.db_for_write(instance.__class__, instance=instance)
 
 
-def random_pic(length=20):
+def get_random_pic_name(length=20):
     return 'pic{}.jpg'.format(
         ''.join(random.choice(string.ascii_letters) for m in range(length)))
 
-
-@pytest.yield_fixture
-def pic1():
+def _pic():
     src = os.path.join(settings.MEDIA_ROOT, 'pic.jpg')
-    dst = os.path.join(settings.MEDIA_ROOT, random_pic())
+    dst = os.path.join(settings.MEDIA_ROOT, get_random_pic_name())
     shutil.copyfile(src, dst)
-    yield {
-        'path': dst,
-        'filename': os.path.split(dst)[-1],
-        'srcpath': src
-    }
-    if os.path.exists(dst):
-        os.remove(dst)
+    try:
+        yield {
+            'path': dst,
+            'filename': os.path.split(dst)[-1],
+            'srcpath': src
+        }
+    finally:
+        if os.path.exists(dst):
+            os.remove(dst)
+
+pic1 = pytest.fixture(_pic)

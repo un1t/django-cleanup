@@ -22,12 +22,12 @@ the model instance. If a condition is detected that should result in a file dele
 delete the file is setup and inserted into the commit phase of the current transaction.
 
 **Warning! If you are using a database that does not support transactions you may lose files if a
-transaction will rollback at the right instance. Though this outcome is mitigated by our use of
-post_save and post_delete signals, this outcome will still occur if there are errors in signals that
-are handled after our signals are handled. In this case, the old file will be lost and the new file
+transaction will rollback at the right instance. This outcome is mitigated by our use of
+post_save and post_delete signals, and by following the recommended configuration below. This
+outcome will still occur if there are signals registered after app initialization and there are
+exceptions when those signals are handled. In this case, the old file will be lost and the new file
 will not be referenced in a model, though the new file will likely still exist on disk. If you are
-concerned about this behavior you will need another solution for old file deletion in your
-project.**
+concerned about this behavior you will need another solution for old file deletion in your project.**
 
 Installation
 ============
@@ -38,7 +38,7 @@ Installation
 
 Configuration
 =============
-Add ``django_cleanup`` to ``settings.py`` after your ``App``
+Add ``django_cleanup`` to the bottom of ``INSTALLED_APPS`` in ``settings.py``
 
 .. code-block:: py
 
@@ -49,20 +49,22 @@ Add ``django_cleanup`` to ``settings.py`` after your ``App``
 
 That is all, no other configuration is necessary.
 
+Note: Order of ``INSTALLED_APPS`` is important. To ensure that exceptions inside other apps' signal
+handlers do not affect the integrity of file deletions within transactions, ``django_cleanup``
+should be placed last in ``INSTALLED_APPS``.
+
 Troubleshooting
 ===============
+If you notice that ``django-cleanup`` is not removing files when expected, check that your models
+are being properly
+`loaded <https://docs.djangoproject.com/en/stable/ref/applications/#how-applications-are-loaded>`_:
 
-If you notice that ``django-cleanup`` is not removing your files when a ``Model`` is deleted, first
-check that your models are being properly 
-`loaded <https://docs.djangoproject.com/en/stable/ref/applications/#how-applications-are-loaded>`_.
-
-::
-
-    You must define or import all models in your application’s models.py or models/__init__.py. 
-    Otherwise, the application registry may not be fully populated at this point, which could cause 
+    You must define or import all models in your application’s models.py or models/__init__.py.
+    Otherwise, the application registry may not be fully populated at this point, which could cause
     the ORM to malfunction.
 
-If your models are not loaded, ``django-cleanup`` will not be able to discover their ``FileField``'s.
+If your models are not loaded, ``django-cleanup`` will not be able to discover their
+``FileField``'s.
 
 You can check if your ``Model`` is loaded by using
 
@@ -122,7 +124,7 @@ Ignore a model and do not perform cleanup when the model is deleted or its files
 How to run tests
 ================
 Install, setup and use pyenv_ to install all the required versions of cPython
-(see the `tox.ini <./tox.ini>`_).
+(see the `tox.ini <https://github.com/un1t/django-cleanup/blob/master/tox.ini>`_).
 
 Setup pyenv_ to have all versions of python activated within your local django-cleanup repository.
 Ensuring that the python 2.7 that was installed is first priority.
