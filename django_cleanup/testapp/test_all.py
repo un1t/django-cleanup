@@ -15,8 +15,9 @@ import pytest
 from django_cleanup import cache, handlers
 
 from . import storage
-from .models.app import Product, ProductIgnore, ProductProxy, ProductUnmanaged, RootProduct, BranchProduct
-from .testing_helpers import get_using, pic1, get_random_pic_name
+from .models.app import (
+    BranchProduct, Product, ProductIgnore, ProductProxy, ProductUnmanaged, RootProduct)
+from .testing_helpers import get_random_pic_name, get_using, pic1
 
 
 PY3 = sys.version_info[0] == 3
