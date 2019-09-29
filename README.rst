@@ -96,7 +96,7 @@ Ignore a model and do not perform cleanup when the model is deleted or its files
 How to run tests
 ================
 Install, setup and use pyenv_ to install all the required versions of cPython
-(see the `tox.ini <./tox.ini>`_).
+(see the `tox.ini <https://github.com/un1t/django-cleanup/blob/master/tox.ini>`_).
 
 Setup pyenv_ to have all versions of python activated within your local django-cleanup repository.
 Ensuring that the python 2.7 that was installed is first priority.

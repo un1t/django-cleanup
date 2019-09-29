@@ -52,3 +52,10 @@ class ProductUnmanaged(ProductAbstract):
     class Meta:
         managed = False
         db_table = 'testapp_product'
+
+class RootProduct(models.Model):
+    pass
+
+class BranchProduct(models.Model):
+    root = models.ForeignKey(RootProduct, on_delete=models.CASCADE)
+    image = models.FileField(upload_to='testapp', blank=True, null=True)
