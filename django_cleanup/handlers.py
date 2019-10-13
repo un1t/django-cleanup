@@ -97,7 +97,7 @@ def delete_file(instance, field_name, file_, using):
     def run_on_commit():
         cleanup_pre_delete.send(sender=None, file=file_)
         try:
-            pass #file_.delete(save=False)
+            file_.delete(save=False)
         except Exception:
             opts = instance._meta
             logger.exception(
