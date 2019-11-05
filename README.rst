@@ -1,3 +1,7 @@
+.. image:: https://img.shields.io/pypi/v/django-cleanup.svg
+    :target: https://pypi.python.org/pypi/django-cleanup/
+
+
 Features
 ========
 The django-cleanup app automatically deletes files for :code:`FileField`, :code:`ImageField` and
