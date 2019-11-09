@@ -26,6 +26,8 @@ matrix:
       env: TOXENV=py36-django22
     - python: "3.7"
       env: TOXENV=py37-django22
+    - python: "pypy3"
+      env: TOXENV=pypy3-django22
 install: pip install tox-travis
 script: tox # setting TOXENV is equivalent to calling `tox -e [ENV]`
 notifications:
