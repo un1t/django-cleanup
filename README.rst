@@ -1,3 +1,7 @@
+Django Cleanup
+**************
+|Version| |Status| |License|
+
 Features
 ========
 The django-cleanup app automatically deletes files for :code:`FileField`, :code:`ImageField` and
@@ -59,7 +63,7 @@ If you notice that ``django-cleanup`` is not removing files when expected, check
 are being properly
 `loaded <https://docs.djangoproject.com/en/stable/ref/applications/#how-applications-are-loaded>`_:
 
-    You must define or import all models in your application’s models.py or models/__init__.py.
+    You must define or import all models in your application's models.py or models/__init__.py.
     Otherwise, the application registry may not be fully populated at this point, which could cause
     the ORM to malfunction.
 
@@ -139,7 +143,7 @@ This app requires the use of django.test.TransactionTestCase_ when writing tests
 For details on why this is required see `here
 <https://docs.djangoproject.com/en/2.1/topics/db/transactions/#use-in-tests>`_:
 
-    Django’s :code:`TestCase` class wraps each test in a transaction and rolls back that transaction
+    Django's :code:`TestCase` class wraps each test in a transaction and rolls back that transaction
     after each test, in order to provide test isolation. This means that no transaction is ever
     actually committed, thus your :code:`on_commit()` callbacks will never be run. If you need to
     test the results of an :code:`on_commit()` callback, use a :code:`TransactionTestCase` instead.
@@ -169,3 +173,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 .. _django.test.TransactionTestCase: https://docs.djangoproject.com/en/2.1/topics/testing/tools/#django.test.TransactionTestCase
 .. _pyenv: https://github.com/pyenv/pyenv
 .. _tox: https://tox.readthedocs.io/en/latest/
+
+.. |Version| image:: https://img.shields.io/pypi/v/django-cleanup.svg
+   :target: https://pypi.python.org/pypi/django-cleanup/
+   :alt: PyPI Package
+.. |Status| image:: https://travis-ci.org/un1t/django-cleanup.svg?branch=master
+   :target: https://travis-ci.org/un1t/django-cleanup
+   :alt: Build Status
+.. |License| image:: https://img.shields.io/badge/license-MIT-maroon
+   :target: https://github.com/un1t/django-cleanup/blob/master/LICENSE
+   :alt: MIT License
