@@ -1,3 +1,7 @@
+.. image:: https://img.shields.io/pypi/v/django-cleanup.svg
+    :target: https://pypi.python.org/pypi/django-cleanup/
+
+
 Features
 ========
 
