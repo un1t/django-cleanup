@@ -1,11 +1,9 @@
 Django Cleanup
 **************
-
 |Version| |Status| |License|
 
 Features
 ========
-
 The django-cleanup app automatically deletes files for :code:`FileField`, :code:`ImageField` and
 subclasses. When a :code:`FileField`'s value is changed and the model is saved, the old file is
 deleted. When a model that has a :code:`FileField` is deleted, the file is also deleted. A file that
