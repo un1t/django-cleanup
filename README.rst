@@ -1,3 +1,7 @@
+Django Cleanup
+**************
+|Version| |Status| |License|
+
 Features
 ========
 The django-cleanup app automatically deletes files for :code:`FileField`, :code:`ImageField` and
@@ -7,7 +11,7 @@ is set as the :code:`FileField`'s default value will not be deleted.
 
 Compatibility
 -------------
-- Django 1.11, 2.1, 2.2 (`See Django Supported Versions <https://www.djangoproject.com/download/#supported-versions>`_)
+- Django 1.11, 2.1, 2.2, 3.0 (`See Django Supported Versions <https://www.djangoproject.com/download/#supported-versions>`_)
 - Python 2.7 and 3.4+
 - Compatible with `sorl-thumbnail <https://github.com/jazzband/sorl-thumbnail>`_
 - Compatible with `easy-thumbnail <https://github.com/SmileyChris/easy-thumbnails>`_
@@ -22,12 +26,12 @@ the model instance. If a condition is detected that should result in a file dele
 delete the file is setup and inserted into the commit phase of the current transaction.
 
 **Warning! If you are using a database that does not support transactions you may lose files if a
-transaction will rollback at the right instance. Though this outcome is mitigated by our use of
-post_save and post_delete signals, this outcome will still occur if there are errors in signals that
-are handled after our signals are handled. In this case, the old file will be lost and the new file
+transaction will rollback at the right instance. This outcome is mitigated by our use of
+post_save and post_delete signals, and by following the recommended configuration below. This
+outcome will still occur if there are signals registered after app initialization and there are
+exceptions when those signals are handled. In this case, the old file will be lost and the new file
 will not be referenced in a model, though the new file will likely still exist on disk. If you are
-concerned about this behavior you will need another solution for old file deletion in your
-project.**
+concerned about this behavior you will need another solution for old file deletion in your project.**
 
 Installation
 ============
@@ -38,8 +42,9 @@ Installation
 
 Configuration
 =============
-Add django_cleanup to settings.py
-::
+Add ``django_cleanup`` to the bottom of ``INSTALLED_APPS`` in ``settings.py``
+
+.. code-block:: py
 
     INSTALLED_APPS = (
         ...,
@@ -47,6 +52,30 @@ Add django_cleanup to settings.py
     )
 
 That is all, no other configuration is necessary.
+
+Note: Order of ``INSTALLED_APPS`` is important. To ensure that exceptions inside other apps' signal
+handlers do not affect the integrity of file deletions within transactions, ``django_cleanup``
+should be placed last in ``INSTALLED_APPS``.
+
+Troubleshooting
+===============
+If you notice that ``django-cleanup`` is not removing files when expected, check that your models
+are being properly
+`loaded <https://docs.djangoproject.com/en/stable/ref/applications/#how-applications-are-loaded>`_:
+
+    You must define or import all models in your application's models.py or models/__init__.py.
+    Otherwise, the application registry may not be fully populated at this point, which could cause
+    the ORM to malfunction.
+
+If your models are not loaded, ``django-cleanup`` will not be able to discover their
+``FileField``'s.
+
+You can check if your ``Model`` is loaded by using
+
+.. code-block:: py
+
+    from django.apps import apps
+    apps.get_models()
 
 Advanced
 ========
@@ -62,7 +91,8 @@ can be imported from :code:`django_cleanup.signals`:
 - :code:`cleanup_post_delete`: just after a file is deleted. Passes a :code:`file` keyword argument.
 
 Signals example for sorl.thumbnail:
-::
+
+.. code-block:: py
 
     from django_cleanup.signals import cleanup_pre_delete
     from sorl.thumbnail import delete
@@ -76,7 +106,8 @@ Refresh the cache
 -----------------
 There have been rare cases where the cache would need to be refreshed. To do so the
 :code:`django_cleanup.cleanup.refresh` method can be used:
-::
+
+.. code-block:: py
 
     from django_cleanup import cleanup
 
@@ -85,7 +116,8 @@ There have been rare cases where the cache would need to be refreshed. To do so 
 Ignore cleanup for a specific model
 -----------------------------------
 Ignore a model and do not perform cleanup when the model is deleted or its files change.
-::
+
+.. code-block:: py
 
     from django_cleanup import cleanup
 
@@ -96,7 +128,7 @@ Ignore a model and do not perform cleanup when the model is deleted or its files
 How to run tests
 ================
 Install, setup and use pyenv_ to install all the required versions of cPython
-(see the `tox.ini <./tox.ini>`_).
+(see the `tox.ini <https://github.com/un1t/django-cleanup/blob/release/4.0/tox.ini>`_).
 
 Setup pyenv_ to have all versions of python activated within your local django-cleanup repository.
 Ensuring that the python 2.7 that was installed is first priority.
@@ -111,33 +143,48 @@ This app requires the use of django.test.TransactionTestCase_ when writing tests
 For details on why this is required see `here
 <https://docs.djangoproject.com/en/2.1/topics/db/transactions/#use-in-tests>`_:
 
-    Django’s :code:`TestCase` class wraps each test in a transaction and rolls back that transaction
+    Django's :code:`TestCase` class wraps each test in a transaction and rolls back that transaction
     after each test, in order to provide test isolation. This means that no transaction is ever
     actually committed, thus your :code:`on_commit()` callbacks will never be run. If you need to
     test the results of an :code:`on_commit()` callback, use a :code:`TransactionTestCase` instead.
 
 License
 =======
-django-cleanup is free software under terms of the MIT License.
+django-cleanup is free software under terms of the:
+
+MIT License
 
 Copyright (C) 2012 by Ilya Shalyapin, ishalyapin@gmail.com
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
-associated documentation files (the "Software"), to deal in the Software without restriction,
-including without limitation the rights to use, copy, modify, merge, publish, distribute,
-sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial
-portions of the Software.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
-NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
-OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 
 .. _django.test.TransactionTestCase: https://docs.djangoproject.com/en/2.1/topics/testing/tools/#django.test.TransactionTestCase
 .. _pyenv: https://github.com/pyenv/pyenv
 .. _tox: https://tox.readthedocs.io/en/latest/
+
+.. |Version| image:: https://img.shields.io/pypi/v/django-cleanup.svg
+   :target: https://pypi.python.org/pypi/django-cleanup/
+   :alt: PyPI Package
+.. |Status| image:: https://travis-ci.org/un1t/django-cleanup.svg?branch=release/4.0
+   :target: https://travis-ci.org/un1t/django-cleanup
+   :alt: Build Status
+.. |License| image:: https://img.shields.io/badge/license-MIT-maroon
+   :target: https://github.com/un1t/django-cleanup/blob/release/4.0/LICENSE
+   :alt: MIT License
