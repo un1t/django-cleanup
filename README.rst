@@ -128,7 +128,7 @@ Ignore a model and do not perform cleanup when the model is deleted or its files
 How to run tests
 ================
 Install, setup and use pyenv_ to install all the required versions of cPython
-(see the `tox.ini <https://github.com/un1t/django-cleanup/blob/master/tox.ini>`_).
+(see the `tox.ini <https://github.com/un1t/django-cleanup/blob/release/4.0/tox.ini>`_).
 
 Setup pyenv_ to have all versions of python activated within your local django-cleanup repository.
 Ensuring that the python 2.7 that was installed is first priority.
@@ -182,9 +182,9 @@ SOFTWARE.
 .. |Version| image:: https://img.shields.io/pypi/v/django-cleanup.svg
    :target: https://pypi.python.org/pypi/django-cleanup/
    :alt: PyPI Package
-.. |Status| image:: https://travis-ci.org/un1t/django-cleanup.svg?branch=master
+.. |Status| image:: https://travis-ci.org/un1t/django-cleanup.svg?branch=release/4.0
    :target: https://travis-ci.org/un1t/django-cleanup
    :alt: Build Status
 .. |License| image:: https://img.shields.io/badge/license-MIT-maroon
-   :target: https://github.com/un1t/django-cleanup/blob/master/LICENSE
+   :target: https://github.com/un1t/django-cleanup/blob/release/4.0/LICENSE
    :alt: MIT License
