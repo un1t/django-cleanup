@@ -1,9 +1,6 @@
-# coding: utf-8
 '''
     Signal handlers to manage FileField files.
 '''
-from __future__ import unicode_literals
-
 import logging
 
 from django.db.models.signals import post_delete, post_init, post_save, pre_save
@@ -16,9 +13,8 @@ from .signals import cleanup_post_delete, cleanup_pre_delete
 logger = logging.getLogger(__name__)
 
 
-class FakeInstance(object):
+class FakeInstance:
     '''A Fake model instance to ensure an instance is not modified'''
-    pass
 
 
 def cache_original_post_init(sender, instance, **kwargs):

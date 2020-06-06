@@ -1,9 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
-import os
-
-from django.conf import settings
 from django.db import models
 
 from django_cleanup import cleanup
@@ -11,7 +5,7 @@ from django_cleanup.cleanup import cleanup_ignore
 
 
 def default_image():
-    return os.path.join(settings.MEDIA_ROOT, 'pic.jpg')
+    return 'pic.jpg'
 
 
 # ignore this cleanup_ignore decorator
@@ -24,7 +18,7 @@ class ProductAbstract(models.Model):
     image = models.FileField(upload_to='testapp', blank=True, null=True)
     image_default = models.FileField(
         upload_to='testapp', blank=True, null=True,
-        default=(os.path.join(settings.MEDIA_ROOT, 'pic.jpg')))
+        default='pic.jpg')
     image_default_callable = models.FileField(
         upload_to='testapp', blank=True, null=True, default=default_image)
 
