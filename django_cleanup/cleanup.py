@@ -1,6 +1,4 @@
 '''Public utilities'''
-from __future__ import unicode_literals
-
 from .cache import (
     get_mangled_ignore as _get_mangled_ignore, make_cleanup_cache as _make_cleanup_cache)
 

@@ -11,8 +11,8 @@ is set as the :code:`FileField`'s default value will not be deleted.
 
 Compatibility
 -------------
-- Django 1.11, 2.1, 2.2, 3.0 (`See Django Supported Versions <https://www.djangoproject.com/download/#supported-versions>`_)
-- Python 2.7 and 3.4+
+- Django 2.2, 3.0 (`See Django Supported Versions <https://www.djangoproject.com/download/#supported-versions>`_)
+- Python 3.5+
 - Compatible with `sorl-thumbnail <https://github.com/jazzband/sorl-thumbnail>`_
 - Compatible with `easy-thumbnail <https://github.com/SmileyChris/easy-thumbnails>`_
 

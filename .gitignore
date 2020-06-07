@@ -8,3 +8,7 @@
 .python-version
 build/*
 dist/*
+env/*
+.vscode/*
+README.html
+*.txt

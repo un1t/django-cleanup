@@ -1,10 +1,7 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
 import logging
 import os
+import pickle
 import re
-import sys
 
 from django.conf import settings
 from django.db import transaction
@@ -17,10 +14,8 @@ from django_cleanup import cache, handlers
 from . import storage
 from .models.app import (
     BranchProduct, Product, ProductIgnore, ProductProxy, ProductUnmanaged, RootProduct)
-from .testing_helpers import get_random_pic_name, get_using, pic1
+from .testing_helpers import get_random_pic_name, get_using, picture
 
-
-PY3 = sys.version_info[0] == 3
 
 LINE = re.compile(r'line \d{1,3}')
 
@@ -31,21 +26,13 @@ TB = '''Traceback (most recent call last):
     self.storage.delete(self.name)
   File "{storage}", line xxx, in delete
     os.remove(name)
-{error}: [Errno 2] No such file or directory: '{{pic1}}\''''
+{error}: [Errno 2] No such file or directory: '{{picture}}\''''
 
-if PY3:
-    import pickle
-else:
-    import cPickle as pickle
 
 
 def getTraceback():
-    if PY3:
-        fileabspath = os.path.abspath
-        error = 'FileNotFoundError'
-    else:
-        fileabspath = lambda x: os.path.abspath(x).replace('.pyc', '.py')
-        error = 'OSError'
+    fileabspath = os.path.abspath
+    error = 'FileNotFoundError'
 
     return TB.format(
         handlers=fileabspath(handlers.__file__),
@@ -61,192 +48,192 @@ def _raise(message):
 
 
 @pytest.mark.django_db(transaction=True)
-def test_refresh_from_db_without_refresh(pic1):
-    product = Product.objects.create(image=pic1['filename'])
-    assert os.path.exists(pic1['path'])
+def test_refresh_from_db_without_refresh(picture):
+    product = Product.objects.create(image=picture['filename'])
+    assert os.path.exists(picture['path'])
     product.refresh_from_db()
     assert id(product.image.instance) == id(product)
     product.image = get_random_pic_name()
     with transaction.atomic(get_using(product)):
         product.save()
-    assert not os.path.exists(pic1['path'])
+    assert not os.path.exists(picture['path'])
 
 
 @pytest.mark.django_db(transaction=True)
-def test_cache_gone(pic1):
-    product = Product.objects.create(image=pic1['filename'])
-    assert os.path.exists(pic1['path'])
+def test_cache_gone(picture):
+    product = Product.objects.create(image=picture['filename'])
+    assert os.path.exists(picture['path'])
     product.image = get_random_pic_name()
     cache.remove_instance_cache(product)
     with transaction.atomic(get_using(product)):
         product.save()
-    assert not os.path.exists(pic1['path'])
+    assert not os.path.exists(picture['path'])
 
 
 @pytest.mark.django_db(transaction=True)
-def test_storage_gone(pic1):
-    product = Product.objects.create(image=pic1['filename'])
-    assert os.path.exists(pic1['path'])
+def test_storage_gone(picture):
+    product = Product.objects.create(image=picture['filename'])
+    assert os.path.exists(picture['path'])
     product.image = get_random_pic_name()
     product = pickle.loads(pickle.dumps(product))
     assert hasattr(product.image, 'storage')
     with transaction.atomic(get_using(product)):
         product.save()
-    assert not os.path.exists(pic1['path'])
+    assert not os.path.exists(picture['path'])
 
 
 @pytest.mark.django_db(transaction=True)
-def test_replace_file_with_file(pic1):
-    product = Product.objects.create(image=pic1['filename'])
-    assert os.path.exists(pic1['path'])
+def test_replace_file_with_file(picture):
+    product = Product.objects.create(image=picture['filename'])
+    assert os.path.exists(picture['path'])
     random_pic_name = get_random_pic_name()
     product.image = random_pic_name
     with transaction.atomic(get_using(product)):
         product.save()
-    assert not os.path.exists(pic1['path'])
+    assert not os.path.exists(picture['path'])
     assert product.image
     new_image_path = os.path.join(settings.MEDIA_ROOT, random_pic_name)
     assert product.image.path == new_image_path
 
 
 @pytest.mark.django_db(transaction=True)
-def test_replace_file_with_blank(pic1):
-    product = Product.objects.create(image=pic1['filename'])
-    assert os.path.exists(pic1['path'])
+def test_replace_file_with_blank(picture):
+    product = Product.objects.create(image=picture['filename'])
+    assert os.path.exists(picture['path'])
     product.image = ''
     with transaction.atomic(get_using(product)):
         product.save()
-    assert not os.path.exists(pic1['path'])
+    assert not os.path.exists(picture['path'])
     assert not product.image
     assert product.image.name == ''
 
 
 @pytest.mark.django_db(transaction=True)
-def test_replace_file_with_none(pic1):
-    product = Product.objects.create(image=pic1['filename'])
-    assert os.path.exists(pic1['path'])
+def test_replace_file_with_none(picture):
+    product = Product.objects.create(image=picture['filename'])
+    assert os.path.exists(picture['path'])
     product.image = None
     with transaction.atomic(get_using(product)):
         product.save()
-    assert not os.path.exists(pic1['path'])
+    assert not os.path.exists(picture['path'])
     assert not product.image
     assert product.image.name is None
 
 
 @pytest.mark.django_db(transaction=True)
-def test_replace_file_proxy(pic1):
-    product = ProductProxy.objects.create(image=pic1['filename'])
-    assert os.path.exists(pic1['path'])
+def test_replace_file_proxy(picture):
+    product = ProductProxy.objects.create(image=picture['filename'])
+    assert os.path.exists(picture['path'])
     product.image = get_random_pic_name()
     with transaction.atomic(get_using(product)):
         product.save()
-    assert not os.path.exists(pic1['path'])
+    assert not os.path.exists(picture['path'])
 
 
 @pytest.mark.django_db(transaction=True)
-def test_replace_file_unmanaged(pic1):
-    product = ProductUnmanaged.objects.create(image=pic1['filename'])
-    assert os.path.exists(pic1['path'])
+def test_replace_file_unmanaged(picture):
+    product = ProductUnmanaged.objects.create(image=picture['filename'])
+    assert os.path.exists(picture['path'])
     product.image = get_random_pic_name()
     with transaction.atomic(get_using(product)):
         product.save()
-    assert not os.path.exists(pic1['path'])
+    assert not os.path.exists(picture['path'])
 
 
 @pytest.mark.django_db(transaction=True)
-def test_replace_file_deferred(pic1):
+def test_replace_file_deferred(picture):
     '''probably shouldn't save from a deferred model but someone might do it'''
-    product = Product.objects.create(image=pic1['filename'])
-    assert os.path.exists(pic1['path'])
+    product = Product.objects.create(image=picture['filename'])
+    assert os.path.exists(picture['path'])
     product_deferred = Product.objects.defer('image_default').get(id=product.id)
     product_deferred.image = get_random_pic_name()
     with transaction.atomic(get_using(product)):
         product_deferred.save()
-    assert not os.path.exists(pic1['path'])
+    assert not os.path.exists(picture['path'])
 
 
 @pytest.mark.django_db(transaction=True)
-def test_remove_model_instance(pic1):
-    product = Product.objects.create(image=pic1['filename'])
-    assert os.path.exists(pic1['path'])
+def test_remove_model_instance(picture):
+    product = Product.objects.create(image=picture['filename'])
+    assert os.path.exists(picture['path'])
     with transaction.atomic(get_using(product)):
         product.delete()
-    assert not os.path.exists(pic1['path'])
+    assert not os.path.exists(picture['path'])
 
 
 @pytest.mark.django_db(transaction=True)
-def test_remove_model_instance_default(pic1):
+def test_remove_model_instance_default(picture):
     product = Product.objects.create()
-    assert product.image_default == pic1['srcpath']
-    assert product.image_default_callable == pic1['srcpath']
-    assert os.path.exists(pic1['srcpath'])
+    assert product.image_default.path == picture['srcpath']
+    assert product.image_default_callable.path == picture['srcpath']
+    assert os.path.exists(picture['srcpath'])
     with transaction.atomic(get_using(product)):
         product.delete()
-    assert os.path.exists(pic1['srcpath'])
+    assert os.path.exists(picture['srcpath'])
 
 
 @pytest.mark.django_db(transaction=True)
-def test_replace_file_with_file_default(pic1):
+def test_replace_file_with_file_default(picture):
     product = Product.objects.create()
-    assert os.path.exists(pic1['srcpath'])
+    assert os.path.exists(picture['srcpath'])
     random_pic_name1 = get_random_pic_name()
     random_pic_name2 = get_random_pic_name()
     product.image_default = random_pic_name1
     product.image_default_callable = random_pic_name2
     with transaction.atomic(get_using(product)):
         product.save()
-    assert os.path.exists(pic1['srcpath'])
+    assert os.path.exists(picture['srcpath'])
 
 
 @pytest.mark.django_db(transaction=True)
-def test_remove_model_instance_ignore(pic1):
-    product = ProductIgnore.objects.create(image=pic1['filename'])
-    assert os.path.exists(pic1['path'])
+def test_remove_model_instance_ignore(picture):
+    product = ProductIgnore.objects.create(image=picture['filename'])
+    assert os.path.exists(picture['path'])
     with transaction.atomic(get_using(product)):
         product.delete()
-    assert os.path.exists(pic1['path'])
+    assert os.path.exists(picture['path'])
 
 
 @pytest.mark.django_db(transaction=True)
-def test_replace_file_with_file_ignore(pic1):
-    product = ProductIgnore.objects.create(image=pic1['filename'])
-    assert os.path.exists(pic1['path'])
+def test_replace_file_with_file_ignore(picture):
+    product = ProductIgnore.objects.create(image=picture['filename'])
+    assert os.path.exists(picture['path'])
     random_pic_name = get_random_pic_name()
     product.image = random_pic_name
     with transaction.atomic(get_using(product)):
         product.save()
-    assert os.path.exists(pic1['path'])
+    assert os.path.exists(picture['path'])
     assert product.image
     new_image_path = os.path.join(settings.MEDIA_ROOT, random_pic_name)
     assert product.image.path == new_image_path
 
 
 @pytest.mark.django_db(transaction=True)
-def test_remove_model_instance_proxy(pic1):
-    product = ProductProxy.objects.create(image=pic1['filename'])
-    assert os.path.exists(pic1['path'])
+def test_remove_model_instance_proxy(picture):
+    product = ProductProxy.objects.create(image=picture['filename'])
+    assert os.path.exists(picture['path'])
     with transaction.atomic(get_using(product)):
         product.delete()
-    assert not os.path.exists(pic1['path'])
+    assert not os.path.exists(picture['path'])
 
 
 @pytest.mark.django_db(transaction=True)
-def test_remove_model_instance_unmanaged(pic1):
-    product = ProductUnmanaged.objects.create(image=pic1['filename'])
-    assert os.path.exists(pic1['path'])
+def test_remove_model_instance_unmanaged(picture):
+    product = ProductUnmanaged.objects.create(image=picture['filename'])
+    assert os.path.exists(picture['path'])
     with transaction.atomic(get_using(product)):
         product.delete()
-    assert not os.path.exists(pic1['path'])
+    assert not os.path.exists(picture['path'])
 
 
 @pytest.mark.django_db(transaction=True)
-def test_remove_model_instance_deferred(pic1):
-    product = Product.objects.create(image=pic1['filename'])
-    assert os.path.exists(pic1['path'])
+def test_remove_model_instance_deferred(picture):
+    product = Product.objects.create(image=picture['filename'])
+    assert os.path.exists(picture['path'])
     product_deferred = Product.objects.defer('image_default').get(id=product.id)
     with transaction.atomic(get_using(product)):
         product_deferred.delete()
-    assert not os.path.exists(pic1['path'])
+    assert not os.path.exists(picture['path'])
 
 
 @pytest.mark.django_db(transaction=True)
@@ -279,36 +266,36 @@ def test_remove_none(monkeypatch):
 
 
 @pytest.mark.django_db(transaction=True)
-def test_exception_on_save(settings, pic1, caplog):
+def test_exception_on_save(settings, picture, caplog):
     settings.DEFAULT_FILE_STORAGE = 'django_cleanup.testapp.storage.DeleteErrorStorage'
-    product = Product.objects.create(image=pic1['filename'])
+    product = Product.objects.create(image=picture['filename'])
     # simulate a fieldfile that has a storage that raises a filenotfounderror on delete
-    assert os.path.exists(pic1['path'])
+    assert os.path.exists(picture['path'])
     product.image.delete(save=False)
     product.image = None
-    assert not os.path.exists(pic1['path'])
+    assert not os.path.exists(picture['path'])
     with transaction.atomic(get_using(product)):
         product.save()
-    assert not os.path.exists(pic1['path'])
+    assert not os.path.exists(picture['path'])
 
     for record in caplog.records:
-        assert LINE.sub('line xxx', record.exc_text) == getTraceback().format(pic1=pic1['path'])
+        assert LINE.sub('line xxx', record.exc_text) == getTraceback().format(picture=picture['path'])
     assert caplog.record_tuples == [
         (
             'django_cleanup.handlers',
             logging.ERROR,
             'There was an exception deleting the file `{}` on field `testapp.product.image`'.format(
-                pic1['filename'])
+                picture['filename'])
         )
     ]
 
 
 @pytest.mark.django_db(transaction=True)
-def test_cascade_delete(pic1):
+def test_cascade_delete(picture):
     root = RootProduct.objects.create()
-    branch = BranchProduct.objects.create(root=root, image=pic1['filename'])
-    assert os.path.exists(pic1['path'])
+    branch = BranchProduct.objects.create(root=root, image=picture['filename'])
+    assert os.path.exists(picture['path'])
     root = RootProduct.objects.get()
     with transaction.atomic(get_using(root)):
         root.delete()
-    assert not os.path.exists(pic1['path'])
+    assert not os.path.exists(picture['path'])

@@ -1,9 +1,6 @@
-# coding: utf-8
 '''
     AppConfig for django-cleanup, prepare the cache and connect signal handlers
 '''
-from __future__ import unicode_literals
-
 from django.apps import AppConfig
 
 from . import cache, handlers
