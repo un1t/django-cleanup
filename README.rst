@@ -131,9 +131,9 @@ Install, setup and use pyenv_ to install all the required versions of cPython
 (see the `tox.ini <https://github.com/un1t/django-cleanup/blob/master/tox.ini>`_).
 
 Setup pyenv_ to have all versions of python activated within your local django-cleanup repository.
-Ensuring that the python 2.7 that was installed is first priority.
+Ensuring that the python 3.8 that was installed is first priority.
 
-Install tox_ on python 2.7 and run the :code:`tox` command from your local django-cleanup
+Install tox_ on python 3.8 and run the :code:`tox` command from your local django-cleanup
 repository.
 
 How to write tests
@@ -141,7 +141,7 @@ How to write tests
 This app requires the use of django.test.TransactionTestCase_ when writing tests.
 
 For details on why this is required see `here
-<https://docs.djangoproject.com/en/2.1/topics/db/transactions/#use-in-tests>`_:
+<https://docs.djangoproject.com/en/stable/topics/db/transactions/#use-in-tests>`_:
 
     Django's :code:`TestCase` class wraps each test in a transaction and rolls back that transaction
     after each test, in order to provide test isolation. This means that no transaction is ever
@@ -175,7 +175,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-.. _django.test.TransactionTestCase: https://docs.djangoproject.com/en/2.1/topics/testing/tools/#django.test.TransactionTestCase
+.. _django.test.TransactionTestCase: https://docs.djangoproject.com/en/stable/topics/testing/tools/#django.test.TransactionTestCase
 .. _pyenv: https://github.com/pyenv/pyenv
 .. _tox: https://tox.readthedocs.io/en/latest/
 
