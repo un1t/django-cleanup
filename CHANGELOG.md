@@ -1,9 +1,9 @@
 # Changelog
 
 
-## [5.1.0] - 2020-09
+## [5.1.0] - 2020-09-xx
 ### Added
-- This CHANGELOG
+- This change log
 
 ### Removed
 - Removed providing_args kwarg from Signal construction. [@coredumperror](https://github.com/coredumperror)
