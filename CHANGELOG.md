@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [5.1.0] - 2020-09-15
 ### Added
-- This change log
+- This change log.
 
 ### Changed
 - Update to run tests for django 3.1. #76 [@johnthagen](https://github.com/johnthagen)
@@ -69,10 +69,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.3.0]: https://github.com/un1t/django-cleanup/compare/0.2.1...0.3.0
 [0.2.1]: https://github.com/un1t/django-cleanup/compare/0.2.0...0.2.1
 [0.2.0]: https://github.com/un1t/django-cleanup/compare/0.1.13...0.2.0
-[0.1.13]: https://github.com/u1t/django-cleanup/compare/0.1.12...0.1.13
-[0.1.12]: https://github.com/u1t/django-cleanup/compare/0.1.11...0.1.12
-[0.1.11]: https://github.com/u1t/django-cleanup/compare/0.1.10...0.1.11
-[0.1.10]: https://github.com/u1t/django-cleanup/compare/0.1.9...0.1.10
+[0.1.13]: https://github.com/un1t/django-cleanup/compare/0.1.12...0.1.13
+[0.1.12]: https://github.com/un1t/django-cleanup/compare/0.1.11...0.1.12
+[0.1.11]: https://github.com/un1t/django-cleanup/compare/0.1.10...0.1.11
+[0.1.10]: https://github.com/un1t/django-cleanup/compare/0.1.9...0.1.10
 [0.1.9]: https://github.com/un1t/django-cleanup/compare/0.1.8...0.1.9
 [0.1.8]: https://github.com/un1t/django-cleanup/compare/0.1.7...0.1.8
 [0.1.7]: https://github.com/un1t/django-cleanup/compare/0.1.6...0.1.7
