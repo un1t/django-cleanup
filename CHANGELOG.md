@@ -79,4 +79,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.1.6]: https://github.com/un1t/django-cleanup/compare/0.1.5...0.1.6
 [0.1.5]: https://github.com/un1t/django-cleanup/compare/0.1.4...0.1.5
 [0.1.4]: https://github.com/un1t/django-cleanup/compare/0.1.0...0.1.4
-[0.1.0]: https://github.com/olivierlacan/keep-a-changelog/releases/tag/0.1.0
+[0.1.0]: https://github.com/un1t/django-cleanup/releases/tag/0.1.0
