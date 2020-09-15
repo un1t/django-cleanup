@@ -3,5 +3,5 @@
     subclasses. It will delete old files when a new file is being save and it
     will delete files on model instance deletion.
 '''
-__version__ = '5.1.0-dev'
+__version__ = '5.1.0'
 default_app_config = 'django_cleanup.apps.CleanupConfig'
