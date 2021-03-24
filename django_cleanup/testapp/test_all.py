@@ -3,7 +3,9 @@ import os
 import pickle
 import re
 
+import tempfile
 from django.conf import settings
+from django.core.files import File
 from django.db import transaction
 from django.db.models.fields import files
 
@@ -299,3 +301,44 @@ def test_cascade_delete(picture):
     with transaction.atomic(get_using(root)):
         root.delete()
     assert not os.path.exists(picture['path'])
+
+
+@pytest.mark.django_db(transaction=True)
+def test_file_exists_on_create_and_update():
+    # If a filepath is specified which already exists,
+    # the FileField generates a random suffix to choose a different location.
+    # We need to make sure, that we fetch this change and would delete the correct one
+    # on further edits or the final deletion.
+    # In this test case it is simulated by using a temporary file located
+    # directly within the same directory as the image would be uploaded to.
+
+    dst_directory = os.path.join(settings.MEDIA_ROOT, Product._meta.get_field("image").upload_to)
+    if not os.path.isdir(dst_directory):
+        os.makedirs(dst_directory)
+
+    with tempfile.NamedTemporaryFile(dir=settings.MEDIA_ROOT) as f:
+        with transaction.atomic():
+            product = Product.objects.create(image=File(f))
+
+        assert f.name != product.image.path
+        assert os.path.exists(f.name)
+        assert os.path.exists(product.image.path)
+
+    path_prior_to_edit = product.image.path
+
+    with tempfile.NamedTemporaryFile(dir=dst_directory) as f:
+        with transaction.atomic(get_using(product)):
+            product.image = File(f)
+            assert f.name == product.image.path
+            product.save()
+
+        assert f.name != product.image.path
+        assert os.path.isfile(f.name)
+        assert os.path.isfile(product.image.path)
+        assert not os.path.isfile(path_prior_to_edit)
+
+        with transaction.atomic(get_using(product)):
+            product.delete()
+
+        assert os.path.isfile(f.name)
+        assert not os.path.isfile(product.image.path)

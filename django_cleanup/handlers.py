@@ -38,14 +38,15 @@ def fallback_pre_save(sender, instance, raw, update_fields, using, **kwargs):
 def delete_old_post_save(sender, instance, raw, created, update_fields, using,
                          **kwargs):
     '''Post_save on all models with file fields, deletes old files'''
-    if raw or created:
+    if raw:
         return
 
-    for field_name, new_file in cache.fields_for_model_instance(instance):
-        if update_fields is None or field_name in update_fields:
-            old_file = cache.get_field_attr(instance, field_name)
-            if old_file != new_file:
-                delete_file(instance, field_name, old_file, using)
+    if not created:
+        for field_name, new_file in cache.fields_for_model_instance(instance):
+            if update_fields is None or field_name in update_fields:
+                old_file = cache.get_field_attr(instance, field_name)
+                if old_file != new_file:
+                    delete_file(instance, field_name, old_file, using)
 
     # reset cache
     cache.make_cleanup_cache(instance)
