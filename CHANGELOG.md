@@ -7,10 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [5.2.0] - TBD
+### Added
+- New test to ensure cache is reset on create. PR [81] from [@Flauschbaellchen](https://github.com/Flauschbaellchen).
+
 ### Changed
 - Update to run tests for django 3.2.
 - Update to document support for django 3.2.
 - Update to run tests for python 3.9. PR [#80] from [@D3X](https://github.com/D3X).
+- Reset cache for created instances in the post_save handler. PR [81] from [@Flauschbaellchen](https://github.com/Flauschbaellchen).
 
 ## [5.1.0] - 2020-09-15
 ### Added
