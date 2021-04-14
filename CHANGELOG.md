@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [5.2.0] - TBD
 ### Added
-- New test to ensure cache is reset on create. PR [81] from [@Flauschbaellchen](https://github.com/Flauschbaellchen).
+- New test to ensure cache is reset on create. PR [#81] from [@Flauschbaellchen](https://github.com/Flauschbaellchen).
 
 ### Changed
 - Update to run tests for django 3.2.
