@@ -316,29 +316,36 @@ def test_file_exists_on_create_and_update():
     if not os.path.isdir(dst_directory):
         os.makedirs(dst_directory)
 
-    with tempfile.NamedTemporaryFile(dir=settings.MEDIA_ROOT) as f:
+    # create the new product with a file to simulate an "upload"
+    # a file aleady exists so the new file is renamed then saved
+    with tempfile.NamedTemporaryFile(prefix="f1__", dir=dst_directory) as f1:
         with transaction.atomic():
-            product = Product.objects.create(image=File(f))
+            product = Product.objects.create(image=File(f1))
 
-        assert f.name != product.image.path
-        assert os.path.exists(f.name)
+        assert f1.name != product.image.path
+        assert os.path.exists(f1.name)
         assert os.path.exists(product.image.path)
 
-    path_prior_to_edit = product.image.path
+        path_prior_to_edit = product.image.path
 
-    with tempfile.NamedTemporaryFile(dir=dst_directory) as f:
-        with transaction.atomic(get_using(product)):
-            product.image = File(f)
-            assert f.name == product.image.path
-            product.save()
+        # edit the product to change the product file to a different file
+        # check that it deletes the renamed file, not the original existing file
+        with tempfile.NamedTemporaryFile(prefix="f2__", dir=dst_directory) as f2:
+            with transaction.atomic(get_using(product)):
+                product.image = File(f2)
+                assert f2.name == product.image.path
+                product.save()
 
-        assert f.name != product.image.path
-        assert os.path.isfile(f.name)
-        assert os.path.isfile(product.image.path)
-        assert not os.path.isfile(path_prior_to_edit)
+            assert f1.name != product.image.path
+            assert os.path.exists(f1.name)
+            assert f2.name != product.image.path
+            assert os.path.isfile(f2.name)
+            assert os.path.isfile(product.image.path)
+            assert not os.path.isfile(path_prior_to_edit)
 
-        with transaction.atomic(get_using(product)):
-            product.delete()
+            with transaction.atomic(get_using(product)):
+                product.delete()
 
-        assert os.path.isfile(f.name)
-        assert not os.path.isfile(product.image.path)
+            assert os.path.isfile(f1.name)
+            assert os.path.isfile(f2.name)
+            assert not os.path.isfile(product.image.path)
