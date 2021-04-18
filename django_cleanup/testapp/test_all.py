@@ -3,7 +3,9 @@ import os
 import pickle
 import re
 
+import tempfile
 from django.conf import settings
+from django.core.files import File
 from django.db import transaction
 from django.db.models.fields import files
 
@@ -299,3 +301,51 @@ def test_cascade_delete(picture):
     with transaction.atomic(get_using(root)):
         root.delete()
     assert not os.path.exists(picture['path'])
+
+
+@pytest.mark.django_db(transaction=True)
+def test_file_exists_on_create_and_update():
+    # If a filepath is specified which already exists,
+    # the FileField generates a random suffix to choose a different location.
+    # We need to make sure, that we fetch this change and would delete the correct one
+    # on further edits or the final deletion.
+    # In this test case it is simulated by using a temporary file located
+    # directly within the same directory as the image would be uploaded to.
+
+    dst_directory = os.path.join(settings.MEDIA_ROOT, Product._meta.get_field("image").upload_to)
+    if not os.path.isdir(dst_directory):
+        os.makedirs(dst_directory)
+
+    # create the new product with a file to simulate an "upload"
+    # a file aleady exists so the new file is renamed then saved
+    with tempfile.NamedTemporaryFile(prefix="f1__", dir=dst_directory) as f1:
+        with transaction.atomic():
+            product = Product.objects.create(image=File(f1))
+
+        assert f1.name != product.image.path
+        assert os.path.exists(f1.name)
+        assert os.path.exists(product.image.path)
+
+        path_prior_to_edit = product.image.path
+
+        # edit the product to change the product file to a different file
+        # check that it deletes the renamed file, not the original existing file
+        with tempfile.NamedTemporaryFile(prefix="f2__", dir=dst_directory) as f2:
+            with transaction.atomic(get_using(product)):
+                product.image = File(f2)
+                assert f2.name == product.image.path
+                product.save()
+
+            assert f1.name != product.image.path
+            assert os.path.exists(f1.name)
+            assert f2.name != product.image.path
+            assert os.path.isfile(f2.name)
+            assert os.path.isfile(product.image.path)
+            assert not os.path.isfile(path_prior_to_edit)
+
+            with transaction.atomic(get_using(product)):
+                product.delete()
+
+            assert os.path.isfile(f1.name)
+            assert os.path.isfile(f2.name)
+            assert not os.path.isfile(product.image.path)

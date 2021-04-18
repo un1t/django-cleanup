@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.2.0] - 2021-04-18
+### Added
+- New test to ensure cache is reset on create. PR [#81] from [@Flauschbaellchen](https://github.com/Flauschbaellchen).
+
+### Changed
+- Update to run tests for django 3.2.
+- Update to document support for django 3.2.
+- Update to run tests for python 3.9. PR [#80] from [@D3X](https://github.com/D3X).
+- Reset cache for created instances in the post_save handler. PR [#81] from [@Flauschbaellchen](https://github.com/Flauschbaellchen).
+
 ## [5.1.0] - 2020-09-15
 ### Added
 - This change log. Resolves issue [#73] for [@DmytroLitvinov](https://github.com/DmytroLitvinov).
@@ -49,6 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2012-08-14
 
 [Unreleased]: https://github.com/un1t/django-cleanup/compare/5.1.0...HEAD
+[5.2.0]: https://github.com/un1t/django-cleanup/compare/5.1.0...5.2.0
 [5.1.0]: https://github.com/un1t/django-cleanup/compare/5.0.0...5.1.0
 [5.0.0]: https://github.com/un1t/django-cleanup/compare/4.0.1...5.0.0
 [4.0.1]: https://github.com/un1t/django-cleanup/compare/4.0.0...4.0.1
@@ -81,6 +92,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.1.4]: https://github.com/un1t/django-cleanup/compare/0.1.0...0.1.4
 [0.1.0]: https://github.com/un1t/django-cleanup/releases/tag/0.1.0
 
+[#81]: https://github.com/un1t/django-cleanup/pull/81
+[#80]: https://github.com/un1t/django-cleanup/pull/80
 [#76]: https://github.com/un1t/django-cleanup/pull/76
 [#74]: https://github.com/un1t/django-cleanup/pull/74
 [#73]: https://github.com/un1t/django-cleanup/issues/73
