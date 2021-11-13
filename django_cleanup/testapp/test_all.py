@@ -332,7 +332,7 @@ def test_file_exists_on_create_and_update():
         # check that it deletes the renamed file, not the original existing file
         with tempfile.NamedTemporaryFile(prefix="f2__", dir=dst_directory) as f2:
             with transaction.atomic(get_using(product)):
-                product.image = File(f2, name=os.path.basename(f2.name))
+                product.image = f2.name
                 assert f2.name == product.image.path
                 product.save()
 
