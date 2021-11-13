@@ -320,7 +320,7 @@ def test_file_exists_on_create_and_update():
     # a file aleady exists so the new file is renamed then saved
     with tempfile.NamedTemporaryFile(prefix="f1__", dir=dst_directory) as f1:
         with transaction.atomic():
-            product = Product.objects.create(image=f1.name)
+            product = Product.objects.create(image=File(f1))
 
         assert f1.name != product.image.path
         assert os.path.exists(f1.name)
