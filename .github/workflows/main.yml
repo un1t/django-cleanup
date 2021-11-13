@@ -1,0 +1,51 @@
+name: CI
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - python: "3.5"
+            toxenv: py35-django22
+          - python: "3.6"
+            toxenv: py36-django22
+          - python: "3.7"
+            toxenv: py37-django22
+          - python: "3.8"
+            toxenv: py38-django22
+          - python: "3.9"
+            toxenv: py39-django22
+          - python: "pypy-3"
+            toxenv: pypy3-django22
+
+          - python: "3.6"
+            toxenv: py36-django32
+          - python: "3.7"
+            toxenv: py37-django32
+          - python: "3.8"
+            toxenv: py38-django32
+          - python: "3.9"
+            toxenv: py39-django32
+          - python: "3.10"
+            toxenv: py310-django32
+          - python: "pypy-3"
+            toxenv: pypy3-django32
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install Test Framework
+        run: pip install tox-gh-actions
+      - name: Run Tests
+        env:
+          TOXENV: ${{ matrix.toxenv }}
+        run: tox # setting TOXENV is equivalent to calling `tox -e [ENV]`

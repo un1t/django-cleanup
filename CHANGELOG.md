@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Update to run tests for python 3.10. PR [#88] from [@johnthagen](https://github.com/johnthagen).
+- GitHub Actions. Resolves issue [#89] for [@johnthagen](https://github.com/johnthagen).
+
+### Changed
+- Fix default_app_config deprecation. PR [#86] from [@nikolaik](https://github.com/nikolaik).
+
+### Removed
+- Dropped support for django 3.0 and 3.1.
+- Travis configuration.
+
 ## [5.2.0] - 2021-04-18
 ### Added
 - New test to ensure cache is reset on create. PR [#81] from [@Flauschbaellchen](https://github.com/Flauschbaellchen).
@@ -58,7 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.4] - 2012-08-16
 ## [0.1.0] - 2012-08-14
 
-[Unreleased]: https://github.com/un1t/django-cleanup/compare/5.1.0...HEAD
+[Unreleased]: https://github.com/un1t/django-cleanup/compare/5.2.0...HEAD
 [5.2.0]: https://github.com/un1t/django-cleanup/compare/5.1.0...5.2.0
 [5.1.0]: https://github.com/un1t/django-cleanup/compare/5.0.0...5.1.0
 [5.0.0]: https://github.com/un1t/django-cleanup/compare/4.0.1...5.0.0
