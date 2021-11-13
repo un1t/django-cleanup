@@ -312,7 +312,8 @@ def test_file_exists_on_create_and_update():
     # In this test case it is simulated by using a temporary file located
     # directly within the same directory as the image would be uploaded to.
 
-    dst_directory = os.path.join(settings.MEDIA_ROOT, Product._meta.get_field("image").upload_to)
+    upload_to = Product._meta.get_field("image").upload_to
+    dst_directory = os.path.join(settings.MEDIA_ROOT, upload_to)
     if not os.path.isdir(dst_directory):
         os.makedirs(dst_directory)
 
@@ -320,7 +321,7 @@ def test_file_exists_on_create_and_update():
     # a file aleady exists so the new file is renamed then saved
     with tempfile.NamedTemporaryFile(prefix="f1__", dir=dst_directory) as f1:
         with transaction.atomic():
-            product = Product.objects.create(image=File(f1, name=os.path.basename(f1.name)))
+            product = Product.objects.create(image=File(f1, name=os.path.join(upload_to, os.path.basename(f1.name))))
 
         assert f1.name != product.image.path
         assert os.path.exists(f1.name)
@@ -332,7 +333,7 @@ def test_file_exists_on_create_and_update():
         # check that it deletes the renamed file, not the original existing file
         with tempfile.NamedTemporaryFile(prefix="f2__", dir=dst_directory) as f2:
             with transaction.atomic(get_using(product)):
-                product.image = f2.name
+                product.image = File(f2, name=os.path.join(upload_to, os.path.basename(f2.name)))
                 assert f2.name == product.image.path
                 product.save()
 
