@@ -45,6 +45,8 @@ matrix:
       env: TOXENV=py38-django32
     - python: "3.9"
       env: TOXENV=py39-django32
+    - python: "3.10"
+      env: TOXENV=py310-django32
     - python: "pypy3"
       env: TOXENV=pypy3-django32
 install: pip install tox-travis
