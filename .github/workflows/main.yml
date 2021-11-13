@@ -22,7 +22,7 @@ jobs:
             toxenv: py38-django22
           - python: "3.9"
             toxenv: py39-django22
-          - python: "pypy-3"
+          - python: "pypy-3.8"
             toxenv: pypy3-django22
 
           - python: "3.6"
@@ -35,7 +35,7 @@ jobs:
             toxenv: py39-django32
           - python: "3.10"
             toxenv: py310-django32
-          - python: "pypy-3"
+          - python: "pypy-3.8"
             toxenv: pypy3-django32
     steps:
       - uses: actions/checkout@v2
