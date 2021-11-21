@@ -2,13 +2,16 @@
     Signal handlers to manage FileField files.
 '''
 import logging
+import os
 
+from django.conf import settings
 from django.db.models.signals import post_delete, post_init, post_save, pre_save
 from django.db.transaction import on_commit
 
 from . import cache
 from .signals import cleanup_post_delete, cleanup_pre_delete
 
+PARENT_FOLDER_CLEANUP_LEVELS = getattr(settings, 'DJANGO_CLEANUP_PARENT_FOLDER_CLEANUP_LEVELS', 0)
 
 logger = logging.getLogger(__name__)
 
@@ -58,6 +61,17 @@ def delete_all_post_delete(sender, instance, using, **kwargs):
         delete_file(instance, field_name, file_, using)
 
 
+def cleanup_parent_folders(file_path):
+    for i in range(0, PARENT_FOLDER_CLEANUP_LEVELS):
+        folder = os.path.dirname(file_path)
+        # remove folder iif empty
+        if os.path.isdir(folder) and len(os.listdir(folder)) <= 0:
+            os.rmdir(folder)
+        else:
+            break
+        file_path = folder
+
+
 def delete_file(instance, field_name, file_, using):
     '''Deletes a file'''
 
@@ -94,7 +108,9 @@ def delete_file(instance, field_name, file_, using):
     def run_on_commit():
         cleanup_pre_delete.send(sender=None, file=file_)
         try:
+            file_path = file_.path
             file_.delete(save=False)
+            cleanup_parent_folders(file_path)
         except Exception:
             opts = instance._meta
             logger.exception(
