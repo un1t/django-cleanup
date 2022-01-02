@@ -103,6 +103,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.1.4]: https://github.com/un1t/django-cleanup/compare/0.1.0...0.1.4
 [0.1.0]: https://github.com/un1t/django-cleanup/releases/tag/0.1.0
 
+[#89]: https://github.com/un1t/django-cleanup/issues/89
+[#88]: https://github.com/un1t/django-cleanup/pull/88
+[#86]: https://github.com/un1t/django-cleanup/pull/86
 [#81]: https://github.com/un1t/django-cleanup/pull/81
 [#80]: https://github.com/un1t/django-cleanup/pull/80
 [#76]: https://github.com/un1t/django-cleanup/pull/76
