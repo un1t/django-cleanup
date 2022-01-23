@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-
+# [6.0.0] - TBD
 ### Added
 - Update to run tests for python 3.10. PR [#88] from [@johnthagen](https://github.com/johnthagen).
 - GitHub Actions. Resolves issue [#89] for [@johnthagen](https://github.com/johnthagen).
@@ -69,7 +69,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.4] - 2012-08-16
 ## [0.1.0] - 2012-08-14
 
-[Unreleased]: https://github.com/un1t/django-cleanup/compare/5.2.0...HEAD
+[Unreleased]: https://github.com/un1t/django-cleanup/compare/6.0.0...HEAD
+[6.0.0]: https://github.com/un1t/django-cleanup/compare/5.2.0...6.0.0
 [5.2.0]: https://github.com/un1t/django-cleanup/compare/5.1.0...5.2.0
 [5.1.0]: https://github.com/un1t/django-cleanup/compare/5.0.0...5.1.0
 [5.0.0]: https://github.com/un1t/django-cleanup/compare/4.0.1...5.0.0
