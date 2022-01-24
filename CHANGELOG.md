@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+## [6.0.0] - 2022-01-24
+### Added
+- Update to run tests for python 3.10. PR [#88] from [@johnthagen](https://github.com/johnthagen).
+- GitHub Actions. Resolves issue [#89] for [@johnthagen](https://github.com/johnthagen).
+
+### Changed
+- Fix default_app_config deprecation. PR [#86] from [@nikolaik](https://github.com/nikolaik).
+
+### Removed
+- Dropped support for django 3.0 and 3.1.
+- Travis configuration.
 
 ## [5.2.0] - 2021-04-18
 ### Added
@@ -58,7 +69,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.4] - 2012-08-16
 ## [0.1.0] - 2012-08-14
 
-[Unreleased]: https://github.com/un1t/django-cleanup/compare/5.1.0...HEAD
+[Unreleased]: https://github.com/un1t/django-cleanup/compare/6.0.0...HEAD
+[6.0.0]: https://github.com/un1t/django-cleanup/compare/5.2.0...6.0.0
 [5.2.0]: https://github.com/un1t/django-cleanup/compare/5.1.0...5.2.0
 [5.1.0]: https://github.com/un1t/django-cleanup/compare/5.0.0...5.1.0
 [5.0.0]: https://github.com/un1t/django-cleanup/compare/4.0.1...5.0.0
@@ -92,6 +104,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.1.4]: https://github.com/un1t/django-cleanup/compare/0.1.0...0.1.4
 [0.1.0]: https://github.com/un1t/django-cleanup/releases/tag/0.1.0
 
+[#89]: https://github.com/un1t/django-cleanup/issues/89
+[#88]: https://github.com/un1t/django-cleanup/pull/88
+[#86]: https://github.com/un1t/django-cleanup/pull/86
 [#81]: https://github.com/un1t/django-cleanup/pull/81
 [#80]: https://github.com/un1t/django-cleanup/pull/80
 [#76]: https://github.com/un1t/django-cleanup/pull/76

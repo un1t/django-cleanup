@@ -11,7 +11,7 @@ is set as the :code:`FileField`'s default value will not be deleted.
 
 Compatibility
 -------------
-- Django 2.2, 3.0, 3.1, 3.2 (`See Django Supported Versions <https://www.djangoproject.com/download/#supported-versions>`_)
+- Django 2.2, 3.2, 4.0 (`See Django Supported Versions <https://www.djangoproject.com/download/#supported-versions>`_)
 - Python 3.5+
 - Compatible with `sorl-thumbnail <https://github.com/jazzband/sorl-thumbnail>`_
 - Compatible with `easy-thumbnail <https://github.com/SmileyChris/easy-thumbnails>`_
@@ -131,9 +131,9 @@ Install, setup and use pyenv_ to install all the required versions of cPython
 (see the `tox.ini <https://github.com/un1t/django-cleanup/blob/master/tox.ini>`_).
 
 Setup pyenv_ to have all versions of python activated within your local django-cleanup repository.
-Ensuring that the python 3.8 that was installed is first priority.
+Ensuring that the python 3.10 that was installed is first priority.
 
-Install tox_ on python 3.8 and run the :code:`tox` command from your local django-cleanup
+Install tox_ on python 3.10 and run the :code:`tox` command from your local django-cleanup
 repository.
 
 How to write tests
@@ -182,8 +182,8 @@ SOFTWARE.
 .. |Version| image:: https://img.shields.io/pypi/v/django-cleanup.svg
    :target: https://pypi.python.org/pypi/django-cleanup/
    :alt: PyPI Package
-.. |Status| image:: https://travis-ci.org/un1t/django-cleanup.svg?branch=master
-   :target: https://travis-ci.org/un1t/django-cleanup
+.. |Status| image:: https://github.com/un1t/django-cleanup/actions/workflows/main.yml/badge.svg
+   :target: https://github.com/un1t/django-cleanup/actions/workflows/main.yml
    :alt: Build Status
 .. |License| image:: https://img.shields.io/badge/license-MIT-maroon
    :target: https://github.com/un1t/django-cleanup/blob/master/LICENSE
