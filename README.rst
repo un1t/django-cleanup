@@ -182,8 +182,8 @@ SOFTWARE.
 .. |Version| image:: https://img.shields.io/pypi/v/django-cleanup.svg
    :target: https://pypi.python.org/pypi/django-cleanup/
    :alt: PyPI Package
-.. |Status| image:: https://travis-ci.org/un1t/django-cleanup.svg?branch=master
-   :target: https://travis-ci.org/un1t/django-cleanup
+.. |Status| image:: https://github.com/un1t/django-cleanup/actions/workflows/main.yml/badge.svg
+   :target: https://github.com/un1t/django-cleanup/actions/workflows/main.yml
    :alt: Build Status
 .. |License| image:: https://img.shields.io/badge/license-MIT-maroon
    :target: https://github.com/un1t/django-cleanup/blob/master/LICENSE
