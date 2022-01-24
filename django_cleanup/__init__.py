@@ -5,6 +5,6 @@
 '''
 import django
 
-__version__ = '6.0.0-dev'
+__version__ = '6.0.0'
 if django.VERSION < (3, 2):
     default_app_config = 'django_cleanup.apps.CleanupConfig'
