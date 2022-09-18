@@ -1,9 +1,9 @@
 '''Public utilities'''
 from .cache import (
-    get_mangled_ignore as _get_mangled_ignore, make_cleanup_cache as _make_cleanup_cache)
+    get_mangled_ignore as _get_mangled_ignore, get_mangled_select as _get_mangled_select, make_cleanup_cache as _make_cleanup_cache)
 
 
-__all__ = ['refresh', 'cleanup_ignore']
+__all__ = ['refresh', 'cleanup_ignore', 'cleanup_select']
 
 
 def refresh(instance):
@@ -16,3 +16,10 @@ def ignore(cls):
     setattr(cls, _get_mangled_ignore(cls), None)
     return cls
 cleanup_ignore = ignore
+
+
+def select(cls):
+    '''Mark a model to select for cleanup'''
+    setattr(cls, _get_mangled_select(cls), None)
+    return cls
+cleanup_select = select

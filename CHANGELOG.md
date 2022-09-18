@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [7.0.0] - TBD
 ### Added
 - Update to run tests for django 4.1.
+- Select mode, with the ability to only cleanup selected models using a `select` decorator. Resolves issue [#75].
 
 ### Removed
 - Dropped support for django 2.2 and python 3.5.

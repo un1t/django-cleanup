@@ -125,6 +125,22 @@ Ignore a model and do not perform cleanup when the model is deleted or its files
     class MyModel(models.Model):
         image = models.FileField()
 
+Only cleanup selected models
+----------------------------
+If you have many models to ignore, or if you prefer to be explicit about what models are selected,
+you can change the mode of django-cleanup to select mode by using the select mode app config. In
+your ``INSTALLED_APPS`` setting you will replace ``'django_cleanup.apps.CleanupConfig'``
+with ``'django_cleanup.apps.CleanupSelectedConfig'``. Then use the ``select`` decorator to mark a
+model for cleanup:
+
+.. code-block:: py
+
+    from django_cleanup import cleanup
+
+    @cleanup.select
+    class MyModel(models.Model):
+        image = models.FileField()
+
 How to run tests
 ================
 Install, setup and use pyenv_ to install all the required versions of cPython
