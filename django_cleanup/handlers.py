@@ -64,6 +64,8 @@ def delete_file(instance, field_name, file_, using):
     if not file_.name:
         return
 
+    cleanup_pre_delete.send(sender=None, file=file_)
+
     # add a fake instance to the file being deleted to avoid
     # any changes to the real instance.
     file_.instance = FakeInstance()
@@ -92,7 +94,6 @@ def delete_file(instance, field_name, file_, using):
     # assuming you are in a transaction and on a database that supports
     # transactions, otherwise it will run immediately
     def run_on_commit():
-        cleanup_pre_delete.send(sender=None, file=file_)
         try:
             file_.delete(save=False)
         except Exception:
