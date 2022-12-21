@@ -14,6 +14,7 @@ jobs:
         include:
           - python: "3.6"
             toxenv: py36-django32
+            os: ubuntu-20.04
           - python: "3.7"
             toxenv: py37-django32
           - python: "3.8"
