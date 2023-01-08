@@ -102,15 +102,17 @@ def delete_file(sender, instance, field_name, file_, using, reason):
     def run_on_commit():
         cleanup_pre_delete.send(sender=sender, **event)
         success = False
+        error = None
         try:
             file_.delete(save=False)
             success = True
-        except Exception:
+        except Exception as ex:
+            error = ex
             opts = instance._meta
             logger.exception(
                 'There was an exception deleting the file `%s` on field `%s.%s.%s`',
                 file_, opts.app_label, opts.model_name, field_name)
-        cleanup_post_delete.send(sender=sender, success=success, **event)
+        cleanup_post_delete.send(sender=sender, error=error, success=success, **event)
 
     on_commit(run_on_commit, using)
 
