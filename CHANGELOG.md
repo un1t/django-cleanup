@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update to run tests on python 3.11 with django 4.1.
 - Select mode, with the ability to only cleanup selected models using a `select` decorator. Resolves issue [#75].
 
+## Changed
+- Pass more data to the cleanup_pre_delete and cleanup_post_delete signals. Resolves issue [#96].
+
 ### Removed
 - Dropped support for django 2.2 and python 3.5.
 
@@ -114,6 +117,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.1.4]: https://github.com/un1t/django-cleanup/compare/0.1.0...0.1.4
 [0.1.0]: https://github.com/un1t/django-cleanup/releases/tag/0.1.0
 
+[#96]: https://github.com/un1t/django-cleanup/issues/96
 [#89]: https://github.com/un1t/django-cleanup/issues/89
 [#88]: https://github.com/un1t/django-cleanup/pull/88
 [#86]: https://github.com/un1t/django-cleanup/pull/86
