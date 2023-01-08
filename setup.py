@@ -29,8 +29,9 @@ def find_version(*parts):
 
 setup(
     name='django-cleanup',
-    version=find_version('django_cleanup', '__init__.py'),
+    version=find_version('src/django_cleanup', '__init__.py'),
     packages=['django_cleanup'],
+    package_dir={'': 'src'},
     include_package_data=True,
     requires=['python (>=3.6)', 'django (>=3.2)'],
     description='Deletes old files.',

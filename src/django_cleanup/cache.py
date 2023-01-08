@@ -131,7 +131,7 @@ def model_has_filefields(model_name):
 
 def ignore_model(model, select_mode):
     '''Check if a model should be ignored'''
-    return not hasattr(model, get_mangled_select(model)) if select_mode else hasattr(model, get_mangled_ignore(model))
+    return (not hasattr(model, get_mangled_select(model))) if select_mode else hasattr(model, get_mangled_ignore(model))
 
 
 # instance functions ##

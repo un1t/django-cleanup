@@ -7,13 +7,13 @@ import pytest
 
 from django_cleanup.signals import cleanup_pre_delete
 
-from .testing_helpers import get_using, picture
+from .testing_helpers import get_using
 
 
 @pytest.mark.django_db(transaction=True)
 def test_sorlthumbnail_replace(settings, picture):
     # https://github.com/mariocesar/sorl-thumbnail
-    models = pytest.importorskip("django_cleanup.testapp.models.integration")
+    models = pytest.importorskip("test.models.integration")
     ProductIntegration = models.ProductIntegration
     sorl_delete = models.sorl_delete
     cleanup_pre_delete.connect(sorl_delete)
@@ -35,7 +35,7 @@ def test_sorlthumbnail_replace(settings, picture):
 @pytest.mark.django_db(transaction=True)
 def test_sorlthumbnail_delete(picture):
     # https://github.com/mariocesar/sorl-thumbnail
-    models = pytest.importorskip("django_cleanup.testapp.models.integration")
+    models = pytest.importorskip("test.models.integration")
     ProductIntegration = models.ProductIntegration
     sorl_delete = models.sorl_delete
     cleanup_pre_delete.connect(sorl_delete)
@@ -56,7 +56,7 @@ def test_sorlthumbnail_delete(picture):
 @pytest.mark.django_db(transaction=True)
 def test_easythumbnails_replace(picture):
     # https://github.com/SmileyChris/easy-thumbnails
-    models = pytest.importorskip("django_cleanup.testapp.models.integration")
+    models = pytest.importorskip("test.models.integration")
     ProductIntegration = models.ProductIntegration
     from easy_thumbnails.files import get_thumbnailer
     product = ProductIntegration.objects.create(easy_image=picture['filename'])
@@ -75,7 +75,7 @@ def test_easythumbnails_replace(picture):
 @pytest.mark.django_db(transaction=True)
 def test_easythumbnails_delete(picture):
     # https://github.com/SmileyChris/easy-thumbnails
-    models = pytest.importorskip("django_cleanup.testapp.models.integration")
+    models = pytest.importorskip("test.models.integration")
     ProductIntegration = models.ProductIntegration
     from easy_thumbnails.files import get_thumbnailer
     product = ProductIntegration.objects.create(easy_image=picture['filename'])
