@@ -48,8 +48,10 @@ class ProductUnmanaged(ProductAbstract):
         managed = False
         db_table = 'test_product'
 
+
 class RootProduct(models.Model):
     pass
+
 
 class BranchProduct(models.Model):
     root = models.ForeignKey(RootProduct, on_delete=models.CASCADE)

@@ -90,7 +90,10 @@ def delete_file(sender, instance, field_name, file_, using, reason):
 
     event = {
         'deleted': reason == 'deleted',
+        'model_name': model_name,
         'field_name': field_name,
+        'file_name': file_.name,
+        'default_file_name': default,
         'file': file_,
         'instance': instance,
         'updated': reason == 'updated'
