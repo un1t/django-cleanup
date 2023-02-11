@@ -24,13 +24,13 @@ DOTTED_PATH = '{klass.__module__}.{klass.__qualname__}'
 # cache init ##
 
 
-def prepare():
+def prepare(select_mode):
     '''Prepare the cache for all models, non-reentrant'''
     if FIELDS:  # pragma: no cover
         return
 
     for model in apps.get_models():
-        if ignore_model(model):
+        if ignore_model(model, select_mode):
             continue
         name = get_model_name(model)
         if model_has_filefields(name):  # pragma: no cover
@@ -113,8 +113,13 @@ def get_model_name(model):
 
 
 def get_mangled_ignore(model):
-    '''returns a mangled attribute name specific to the model'''
+    '''returns a mangled attribute name specific to the model for ignore functionality'''
     return '_{opt.model_name}__{opt.app_label}_cleanup_ignore'.format(opt=model._meta)
+
+
+def get_mangled_select(model):
+    '''returns a mangled attribute name specific to the model for select functionality'''
+    return '_{opt.model_name}__{opt.app_label}_cleanup_select'.format(opt=model._meta)
 
 
 # booleans ##
@@ -125,9 +130,9 @@ def model_has_filefields(model_name):
     return model_name in FIELDS
 
 
-def ignore_model(model):
+def ignore_model(model, select_mode):
     '''Check if a model should be ignored'''
-    return hasattr(model, get_mangled_ignore(model))
+    return (not hasattr(model, get_mangled_select(model))) if select_mode else hasattr(model, get_mangled_ignore(model))
 
 
 # instance functions ##

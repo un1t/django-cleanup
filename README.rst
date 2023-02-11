@@ -11,8 +11,8 @@ is set as the :code:`FileField`'s default value will not be deleted.
 
 Compatibility
 -------------
-- Django 2.2, 3.2, 4.0 (`See Django Supported Versions <https://www.djangoproject.com/download/#supported-versions>`_)
-- Python 3.5+
+- Django 3.2, 4.0, 4.1 (`See Django Supported Versions <https://www.djangoproject.com/download/#supported-versions>`_)
+- Python 3.6+
 - Compatible with `sorl-thumbnail <https://github.com/jazzband/sorl-thumbnail>`_
 - Compatible with `easy-thumbnail <https://github.com/SmileyChris/easy-thumbnails>`_
 
@@ -25,13 +25,7 @@ whether or not a :code:`FileField`'s value has changed a local cache of original
 the model instance. If a condition is detected that should result in a file deletion, a function to
 delete the file is setup and inserted into the commit phase of the current transaction.
 
-**Warning! If you are using a database that does not support transactions you may lose files if a
-transaction will rollback at the right instance. This outcome is mitigated by our use of
-post_save and post_delete signals, and by following the recommended configuration below. This
-outcome will still occur if there are signals registered after app initialization and there are
-exceptions when those signals are handled. In this case, the old file will be lost and the new file
-will not be referenced in a model, though the new file will likely still exist on disk. If you are
-concerned about this behavior you will need another solution for old file deletion in your project.**
+**Warning! Please be aware of the known limitations documented below!**
 
 Installation
 ============
@@ -77,6 +71,28 @@ You can check if your ``Model`` is loaded by using
     from django.apps import apps
     apps.get_models()
 
+Known limitations
+=================
+
+Database should support transactions
+------------------------------------
+If you are using a database that does not support transactions you may lose files if a
+transaction will rollback at the right instance. This outcome is mitigated by our use of
+post_save and post_delete signals, and by following the recommended configuration in this README.
+This outcome will still occur if there are signals registered after app initialization and there are
+exceptions when those signals are handled. In this case, the old file will be lost and the new file
+will not be referenced in a model, though the new file will likely still exist on disk. If you are
+concerned about this behavior you will need another solution for old file deletion in your project.
+
+File referenced by multiple model instances
+-------------------------------------------
+This app is designed with the assumption that each file is referenced only once. If you are sharing
+a file over two or more model instances you will not have the desired functionality. Be cautious of
+copying model instances, as this will cause a file to be shared by more than one instance. If you
+want to reference a file from multiple models add a level of indirection. That is, use a separate
+file model that is referenced from other models through a foreign key. There are many file
+management apps already available in the django ecosystem that fulfill this behavior.
+
 Advanced
 ========
 This section contains additional functionality that can be used to interact with django-cleanup for
@@ -115,13 +131,30 @@ There have been rare cases where the cache would need to be refreshed. To do so 
 
 Ignore cleanup for a specific model
 -----------------------------------
-Ignore a model and do not perform cleanup when the model is deleted or its files change.
+To ignore a model and not have cleanup performed when the model is deleted or its files change, use
+the :code:`ignore` decorator to mark that model:
 
 .. code-block:: py
 
     from django_cleanup import cleanup
 
     @cleanup.ignore
+    class MyModel(models.Model):
+        image = models.FileField()
+
+Only cleanup selected models
+----------------------------
+If you have many models to ignore, or if you prefer to be explicit about what models are selected,
+you can change the mode of django-cleanup to "select mode" by using the select mode app config. In
+your ``INSTALLED_APPS`` setting you will replace ':code:`django_cleanup.apps.CleanupConfig`'
+with ':code:`django_cleanup.apps.CleanupSelectedConfig`'. Then use the :code:`select` decorator to
+mark a model for cleanup:
+
+.. code-block:: py
+
+    from django_cleanup import cleanup
+
+    @cleanup.select
     class MyModel(models.Model):
         image = models.FileField()
 

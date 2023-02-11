@@ -5,8 +5,8 @@ from .app import ProductAbstract
 
 
 class ProductIntegrationAbstract(ProductAbstract):
-    sorl_image = ImageField(upload_to='testapp', blank=True)
-    easy_image = ThumbnailerImageField(upload_to='testapp', blank=True)
+    sorl_image = ImageField(upload_to='test', blank=True)
+    easy_image = ThumbnailerImageField(upload_to='test', blank=True)
 
     class Meta:
         abstract = True

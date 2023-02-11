@@ -46,7 +46,7 @@ def delete_old_post_save(sender, instance, raw, created, update_fields, using,
             if update_fields is None or field_name in update_fields:
                 old_file = cache.get_field_attr(instance, field_name)
                 if old_file != new_file:
-                    delete_file(instance, field_name, old_file, using)
+                    delete_file(sender, instance, field_name, old_file, using, 'updated')
 
     # reset cache
     cache.make_cleanup_cache(instance)
@@ -55,10 +55,10 @@ def delete_old_post_save(sender, instance, raw, created, update_fields, using,
 def delete_all_post_delete(sender, instance, using, **kwargs):
     '''Post_delete on all models with file fields, deletes all files'''
     for field_name, file_ in cache.fields_for_model_instance(instance):
-        delete_file(instance, field_name, file_, using)
+        delete_file(sender, instance, field_name, file_, using, 'deleted')
 
 
-def delete_file(instance, field_name, file_, using):
+def delete_file(sender, instance, field_name, file_, using, reason):
     '''Deletes a file'''
 
     if not file_.name:
@@ -88,19 +88,34 @@ def delete_file(instance, field_name, file_, using):
     if not hasattr(file_, 'storage'):
         file_.storage = cache.get_field_storage(model_name, field_name)()
 
+    event = {
+        'deleted': reason == 'deleted',
+        'model_name': model_name,
+        'field_name': field_name,
+        'file_name': file_.name,
+        'default_file_name': default,
+        'file': file_,
+        'instance': instance,
+        'updated': reason == 'updated'
+    }
+
     # this will run after a successful commit
     # assuming you are in a transaction and on a database that supports
     # transactions, otherwise it will run immediately
     def run_on_commit():
-        cleanup_pre_delete.send(sender=None, file=file_)
+        cleanup_pre_delete.send(sender=sender, **event)
+        success = False
+        error = None
         try:
             file_.delete(save=False)
-        except Exception:
+            success = True
+        except Exception as ex:
+            error = ex
             opts = instance._meta
             logger.exception(
                 'There was an exception deleting the file `%s` on field `%s.%s.%s`',
                 file_, opts.app_label, opts.model_name, field_name)
-        cleanup_post_delete.send(sender=None, file=file_)
+        cleanup_post_delete.send(sender=sender, error=error, success=success, **event)
 
     on_commit(run_on_commit, using)
 

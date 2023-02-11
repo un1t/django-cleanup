@@ -15,17 +15,18 @@ def default_image():
 # see the ProductIgnore model below for how to use the decorator
 @cleanup_ignore
 class ProductAbstract(models.Model):
-    image = models.FileField(upload_to='testapp', blank=True, null=True)
+    image = models.FileField(upload_to='test', blank=True, null=True)
     image_default = models.FileField(
-        upload_to='testapp', blank=True, null=True,
+        upload_to='test', blank=True, null=True,
         default='pic.jpg')
     image_default_callable = models.FileField(
-        upload_to='testapp', blank=True, null=True, default=default_image)
+        upload_to='test', blank=True, null=True, default=default_image)
 
     class Meta:
         abstract = True
 
 
+@cleanup.select
 class Product(ProductAbstract):
     pass
 
@@ -45,11 +46,13 @@ class ProductUnmanaged(ProductAbstract):
 
     class Meta:
         managed = False
-        db_table = 'testapp_product'
+        db_table = 'test_product'
+
 
 class RootProduct(models.Model):
     pass
 
+
 class BranchProduct(models.Model):
     root = models.ForeignKey(RootProduct, on_delete=models.CASCADE)
-    image = models.FileField(upload_to='testapp', blank=True, null=True)
+    image = models.FileField(upload_to='test', blank=True, null=True)

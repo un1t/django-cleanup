@@ -8,25 +8,13 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     strategy:
       matrix:
         include:
-          - python: "3.5"
-            toxenv: py35-django22
-          - python: "3.6"
-            toxenv: py36-django22
-          - python: "3.7"
-            toxenv: py37-django22
-          - python: "3.8"
-            toxenv: py38-django22
-          - python: "3.9"
-            toxenv: py39-django22
-          - python: "pypy-3.8"
-            toxenv: pypy3-django22
-
           - python: "3.6"
             toxenv: py36-django32
+            os: ubuntu-20.04
           - python: "3.7"
             toxenv: py37-django32
           - python: "3.8"
@@ -46,6 +34,17 @@ jobs:
             toxenv: py310-django40
           - python: "pypy-3.8"
             toxenv: pypy3-django40
+
+          - python: "3.8"
+            toxenv: py38-django41
+          - python: "3.9"
+            toxenv: py39-django41
+          - python: "3.10"
+            toxenv: py310-django41
+          - python: "3.11"
+            toxenv: py311-django41
+          - python: "pypy-3.8"
+            toxenv: pypy3-django41
     steps:
       - uses: actions/checkout@v2
       - name: Setup Python
