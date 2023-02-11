@@ -25,7 +25,7 @@ whether or not a :code:`FileField`'s value has changed a local cache of original
 the model instance. If a condition is detected that should result in a file deletion, a function to
 delete the file is setup and inserted into the commit phase of the current transaction.
 
-**Warning! Please be aware of the Known Limitations documented below!**
+**Warning! Please be aware of the known limitations documented below!**
 
 Installation
 ============
@@ -71,10 +71,10 @@ You can check if your ``Model`` is loaded by using
     from django.apps import apps
     apps.get_models()
 
-Known Limitations
+Known limitations
 =================
 
-Database Should Support Transactions
+Database should support transactions
 ------------------------------------
 If you are using a database that does not support transactions you may lose files if a
 transaction will rollback at the right instance. This outcome is mitigated by our use of
@@ -87,10 +87,11 @@ concerned about this behavior you will need another solution for old file deleti
 File referenced by multiple model instances
 -------------------------------------------
 This app is designed with the assumption that each file is referenced only once. If you are sharing
-a file over two or more model instances you will not have the desired functionality. If you want to 
-reference a file from multiple models add a level of indirection. That is, use a separate file model
-that is referenced from other models through a foreign key. There are many file management apps
-already available in the django ecosystem that fulfill this behavior.
+a file over two or more model instances you will not have the desired functionality. Be cautious of
+copying model instances, as this will cause a file to be shared by more than one instance. If you
+want to reference a file from multiple models add a level of indirection. That is, use a separate
+file model that is referenced from other models through a foreign key. There are many file
+management apps already available in the django ecosystem that fulfill this behavior.
 
 Advanced
 ========

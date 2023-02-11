@@ -7,12 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ## [7.0.0] - TBD
 ### Added
-- Update to run tests for django 4.1.
-- Update to run tests on python 3.11 with django 4.1.
-- Select mode, with the ability to only cleanup selected models using a `select` decorator. Resolves issue [#75].
+- Run tests for django 4.1.
+- Run tests on python 3.11 with django 4.1.
+- Select mode, with the ability to only cleanup selected models using a `select` decorator. Resolves issue [#75] for [@daviddavis](https://github.com/daviddavis).
+- Documentation on the known limitations of referencing a file by multiple model instances. Resolves issue [#98] for [@Grosskopf](https://github.com/Grosskopf)
 
 ## Changed
-- Pass more data to the cleanup_pre_delete and cleanup_post_delete signals. Resolves issue [#96].
+- Pass more data to the cleanup_pre_delete and cleanup_post_delete signals. Resolves issue [#96] for [@NadavK](https://github.com/NadavK).
 
 ### Removed
 - Dropped support for django 2.2 and python 3.5.
@@ -81,7 +82,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.4] - 2012-08-16
 ## [0.1.0] - 2012-08-14
 
-[Unreleased]: https://github.com/un1t/django-cleanup/compare/6.0.0...HEAD
+[Unreleased]: https://github.com/un1t/django-cleanup/compare/7.0.0...HEAD
 [7.0.0]: https://github.com/un1t/django-cleanup/compare/6.0.0...7.0.0
 [6.0.0]: https://github.com/un1t/django-cleanup/compare/5.2.0...6.0.0
 [5.2.0]: https://github.com/un1t/django-cleanup/compare/5.1.0...5.2.0
@@ -117,6 +118,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.1.4]: https://github.com/un1t/django-cleanup/compare/0.1.0...0.1.4
 [0.1.0]: https://github.com/un1t/django-cleanup/releases/tag/0.1.0
 
+[#98]: https://github.com/un1t/django-cleanup/issues/98
 [#96]: https://github.com/un1t/django-cleanup/issues/96
 [#89]: https://github.com/un1t/django-cleanup/issues/89
 [#88]: https://github.com/un1t/django-cleanup/pull/88
@@ -124,5 +126,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#81]: https://github.com/un1t/django-cleanup/pull/81
 [#80]: https://github.com/un1t/django-cleanup/pull/80
 [#76]: https://github.com/un1t/django-cleanup/pull/76
+[#75]: https://github.com/un1t/django-cleanup/issues/75
 [#74]: https://github.com/un1t/django-cleanup/pull/74
 [#73]: https://github.com/un1t/django-cleanup/issues/73

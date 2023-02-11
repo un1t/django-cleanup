@@ -24,7 +24,7 @@ DOTTED_PATH = '{klass.__module__}.{klass.__qualname__}'
 # cache init ##
 
 
-def prepare(select_mode=False):
+def prepare(select_mode):
     '''Prepare the cache for all models, non-reentrant'''
     if FIELDS:  # pragma: no cover
         return
@@ -120,6 +120,7 @@ def get_mangled_ignore(model):
 def get_mangled_select(model):
     '''returns a mangled attribute name specific to the model for select functionality'''
     return '_{opt.model_name}__{opt.app_label}_cleanup_select'.format(opt=model._meta)
+
 
 # booleans ##
 

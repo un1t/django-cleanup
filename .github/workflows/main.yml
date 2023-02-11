@@ -42,7 +42,7 @@ jobs:
           - python: "3.10"
             toxenv: py310-django41
           - python: "3.11"
-            toxenv: py310-django41
+            toxenv: py311-django41
           - python: "pypy-3.8"
             toxenv: pypy3-django41
     steps:

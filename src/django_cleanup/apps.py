@@ -12,7 +12,7 @@ class CleanupConfig(AppConfig):
     default = True
 
     def ready(self):
-        cache.prepare()
+        cache.prepare(False)
         handlers.connect()
 
 class CleanupSelectedConfig(AppConfig):
