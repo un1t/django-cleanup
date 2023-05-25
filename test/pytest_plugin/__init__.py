@@ -10,3 +10,4 @@ def pytest_load_initial_conftests(early_config, parser, args):
         args.remove('--forked')
     if platform.python_implementation() == 'PyPy':
         args.remove('--cov-report=term-missing --cov=django_cleanup')
+        args.add('--no-cov')
