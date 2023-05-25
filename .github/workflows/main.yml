@@ -45,6 +45,17 @@ jobs:
             toxenv: py311-django41
           - python: "pypy-3.8"
             toxenv: pypy3-django41
+
+          - python: "3.8"
+            toxenv: py38-django42
+          - python: "3.9"
+            toxenv: py39-django42
+          - python: "3.10"
+            toxenv: py310-django42
+          - python: "3.11"
+            toxenv: py311-django42
+          - python: "pypy-3.8"
+            toxenv: pypy3-django42
     steps:
       - uses: actions/checkout@v2
       - name: Setup Python
