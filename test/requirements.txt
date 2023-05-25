@@ -7,4 +7,4 @@ pytest-pythonpath
 pytest-cov
 pytest-xdist
 pytest-forked
-asgiref==3.6.0
+asgiref<3.7.0
