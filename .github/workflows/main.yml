@@ -27,15 +27,6 @@ jobs:
             toxenv: pypy3-django32
 
           - python: "3.8"
-            toxenv: py38-django40
-          - python: "3.9"
-            toxenv: py39-django40
-          - python: "3.10"
-            toxenv: py310-django40
-          - python: "pypy-3.9"
-            toxenv: pypy3-django40
-
-          - python: "3.8"
             toxenv: py38-django41
           - python: "3.9"
             toxenv: py39-django41

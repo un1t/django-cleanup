@@ -11,7 +11,7 @@ is set as the :code:`FileField`'s default value will not be deleted.
 
 Compatibility
 -------------
-- Django 3.2, 4.0, 4.1 (`See Django Supported Versions <https://www.djangoproject.com/download/#supported-versions>`_)
+- Django 3.2, 4.1, 4.2 (`See Django Supported Versions <https://www.djangoproject.com/download/#supported-versions>`_)
 - Python 3.6+
 - Compatible with `sorl-thumbnail <https://github.com/jazzband/sorl-thumbnail>`_
 - Compatible with `easy-thumbnail <https://github.com/SmileyChris/easy-thumbnails>`_
@@ -164,9 +164,9 @@ Install, setup and use pyenv_ to install all the required versions of cPython
 (see the `tox.ini <https://github.com/un1t/django-cleanup/blob/master/tox.ini>`_).
 
 Setup pyenv_ to have all versions of python activated within your local django-cleanup repository.
-Ensuring that the python 3.10 that was installed is first priority.
+Ensuring that the python 3.11 that was installed is first priority.
 
-Install tox_ on python 3.10 and run the :code:`tox` command from your local django-cleanup
+Install tox_ on python 3.11 and run the :code:`tox` command from your local django-cleanup
 repository.
 
 How to write tests
