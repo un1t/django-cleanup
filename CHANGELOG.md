@@ -5,12 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-## [8.0.0] - 2023-06-xx
+## [8.0.0] - 2023-06-14
 ### Added
 - Run tests for django 4.2. PR [#100] from [@johnthagen](https://github.com/johnthagen).
 
 ### Removed
-- Dropped support for django 4.0
+- Dropped support for django 4.0.
 
 ## [7.0.0] - 2023-02-11
 ### Added
