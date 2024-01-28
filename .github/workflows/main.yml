@@ -23,7 +23,7 @@ jobs:
             toxenv: py39-django32
           - python: "3.10"
             toxenv: py310-django32
-          - python: "pypy-3.9"
+          - python: "pypy-3.10"
             toxenv: pypy3-django32
 
           - python: "3.8"
@@ -34,7 +34,7 @@ jobs:
             toxenv: py310-django41
           - python: "3.11"
             toxenv: py311-django41
-          - python: "pypy-3.9"
+          - python: "pypy-3.10"
             toxenv: pypy3-django41
 
           - python: "3.8"
@@ -45,8 +45,17 @@ jobs:
             toxenv: py310-django42
           - python: "3.11"
             toxenv: py311-django42
-          - python: "pypy-3.9"
+          - python: "pypy-3.10"
             toxenv: pypy3-django42
+            
+          - python: "3.10"
+            toxenv: py310-django50
+          - python: "3.11"
+            toxenv: py311-django50
+          - python: "3.12"
+            toxenv: py312-django50
+          - python: "pypy-3.10"
+            toxenv: pypy3-django50
     steps:
       - uses: actions/checkout@v2
       - name: Setup Python

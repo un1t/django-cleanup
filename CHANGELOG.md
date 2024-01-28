@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+## [8.1.0] - 2024-01-28
+### Added
+- Run tests for django 5.0 and python 3.12.
+
 ## [8.0.0] - 2023-06-14
 ### Added
 - Run tests for django 4.2. PR [#100] from [@johnthagen](https://github.com/johnthagen).
@@ -89,7 +93,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.4] - 2012-08-16
 ## [0.1.0] - 2012-08-14
 
-[Unreleased]: https://github.com/un1t/django-cleanup/compare/8.0.0...HEAD
+[Unreleased]: https://github.com/un1t/django-cleanup/compare/8.1.0...HEAD
+[8.1.0]: https://github.com/un1t/django-cleanup/compare/8.0.0...8.1.0
 [8.0.0]: https://github.com/un1t/django-cleanup/compare/7.0.0...8.0.0
 [7.0.0]: https://github.com/un1t/django-cleanup/compare/6.0.0...7.0.0
 [6.0.0]: https://github.com/un1t/django-cleanup/compare/5.2.0...6.0.0
