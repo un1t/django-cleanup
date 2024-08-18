@@ -180,6 +180,9 @@ For details on why this is required see `here
     actually committed, thus your :code:`on_commit()` callbacks will never be run. If you need to
     test the results of an :code:`on_commit()` callback, use a :code:`TransactionTestCase` instead.
 
+In case you are writing tests with pytest_, use `@pytest.mark.django_db(transaction=True)
+<https://pytest-django.readthedocs.io/en/latest/helpers.html#pytest.mark.django_db>`_ (note the ``transaction=True`` argument).
+
 License
 =======
 django-cleanup is free software under terms of the:
@@ -208,6 +211,7 @@ SOFTWARE.
 
 
 .. _django.test.TransactionTestCase: https://docs.djangoproject.com/en/stable/topics/testing/tools/#django.test.TransactionTestCase
+.. _pytest: https://docs.pytest.org
 .. _pyenv: https://github.com/pyenv/pyenv
 .. _tox: https://tox.readthedocs.io/en/latest/
 
