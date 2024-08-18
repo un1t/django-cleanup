@@ -12,31 +12,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - python: "3.6"
-            toxenv: py36-django32
-            os: ubuntu-20.04
-          - python: "3.7"
-            toxenv: py37-django32
-          - python: "3.8"
-            toxenv: py38-django32
-          - python: "3.9"
-            toxenv: py39-django32
-          - python: "3.10"
-            toxenv: py310-django32
-          - python: "pypy-3.10"
-            toxenv: pypy3-django32
-
-          - python: "3.8"
-            toxenv: py38-django41
-          - python: "3.9"
-            toxenv: py39-django41
-          - python: "3.10"
-            toxenv: py310-django41
-          - python: "3.11"
-            toxenv: py311-django41
-          - python: "pypy-3.10"
-            toxenv: pypy3-django41
-
           - python: "3.8"
             toxenv: py38-django42
           - python: "3.9"
@@ -45,6 +20,8 @@ jobs:
             toxenv: py310-django42
           - python: "3.11"
             toxenv: py311-django42
+          - python: "3.12"
+            toxenv: py312-django42
           - python: "pypy-3.10"
             toxenv: pypy3-django42
             
@@ -56,6 +33,15 @@ jobs:
             toxenv: py312-django50
           - python: "pypy-3.10"
             toxenv: pypy3-django50
+
+          - python: "3.10"
+            toxenv: py310-django51
+          - python: "3.11"
+            toxenv: py311-django51
+          - python: "3.12"
+            toxenv: py312-django51
+          - python: "pypy-3.10"
+            toxenv: pypy3-django51
     steps:
       - uses: actions/checkout@v2
       - name: Setup Python
