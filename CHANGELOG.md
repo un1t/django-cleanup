@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [9.0.0] - TDB
 ## Added
 - pyproject.toml
+- Documentation on how to use transaction test case when using pytest. PR [#108] from [pavel-kalmykov](https://github.com/pavel-kalmykov).
 
 ### Changed
 - Update to remove specific version references, since there haven't been significant changes the approach on versioning will change. The version will no longer update when only tests or supported versions are updated.
@@ -143,6 +144,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.1.4]: https://github.com/un1t/django-cleanup/compare/0.1.0...0.1.4
 [0.1.0]: https://github.com/un1t/django-cleanup/releases/tag/0.1.0
 
+[#108]: https://github.com/un1t/django-cleanup/pull/108
 [#100]: https://github.com/un1t/django-cleanup/pull/100
 [#98]: https://github.com/un1t/django-cleanup/issues/98
 [#96]: https://github.com/un1t/django-cleanup/issues/96
