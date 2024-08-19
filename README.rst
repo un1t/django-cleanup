@@ -11,7 +11,7 @@ is set as the :code:`FileField`'s default value will not be deleted.
 
 Compatibility
 -------------
-- This app follows Django's `supported versions <https://www.djangoproject.com/download/#supported-versions>`_ and `Python version support <https://docs.djangoproject.com/en/dev/faq/install/#what-python-version-can-i-use-with-django>`_.
+- This app follows Django's `supported versions`_ and `Python version support`_.
 - Compatible with `sorl-thumbnail <https://github.com/jazzband/sorl-thumbnail>`_
 - Compatible with `easy-thumbnail <https://github.com/SmileyChris/easy-thumbnails>`_
 
@@ -165,8 +165,8 @@ Install, setup and use pyenv_ to install all the required versions of cPython
 Setup pyenv_ to have all versions of python activated within your local django-cleanup repository.
 Ensuring that the latest supported python version that was installed is first priority.
 
-Install tox_ on the latest supported python version and run the :code:`tox` command from your local django-cleanup
-repository.
+Install tox_ on the latest supported python version and run the :code:`tox` command from your local
+django-cleanup repository.
 
 How to write tests
 ==================
@@ -180,8 +180,11 @@ For details on why this is required see `here
     actually committed, thus your :code:`on_commit()` callbacks will never be run. If you need to
     test the results of an :code:`on_commit()` callback, use a :code:`TransactionTestCase` instead.
 
-In case you are writing tests with pytest_, use `@pytest.mark.django_db(transaction=True)
-<https://pytest-django.readthedocs.io/en/latest/helpers.html#pytest.mark.django_db>`_ (note the ``transaction=True`` argument).
+pytest
+------
+When writing tests with pytest_ use `@pytest.mark.django_db(transaction=True)`_ with the
+:code:`transaction` argument set to :code:`True` to ensure that the behavior will be the same as 
+using a transaction test case.
 
 License
 =======
@@ -214,6 +217,9 @@ SOFTWARE.
 .. _pytest: https://docs.pytest.org
 .. _pyenv: https://github.com/pyenv/pyenv
 .. _tox: https://tox.readthedocs.io/en/latest/
+.. _supported versions: https://www.djangoproject.com/download/#supported-versions
+.. _Python version support: https://docs.djangoproject.com/en/dev/faq/install/#what-python-version-can-i-use-with-django
+.. _@pytest.mark.django_db(transaction=True): https://pytest-django.readthedocs.io/en/latest/helpers.html#pytest.mark.django_db
 
 .. |Version| image:: https://img.shields.io/pypi/v/django-cleanup.svg
    :target: https://pypi.python.org/pypi/django-cleanup/
