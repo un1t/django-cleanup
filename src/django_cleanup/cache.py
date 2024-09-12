@@ -18,7 +18,6 @@ def fields_dict_default():
     return {}
 FIELDS_FIELDS = defaultdict(fields_dict_default)
 FIELDS_STORAGE = defaultdict(fields_dict_default)
-DOTTED_PATH = '{klass.__module__}.{klass.__qualname__}'
 
 
 # cache init ##
@@ -82,7 +81,7 @@ def fields_for_model_instance(instance, using=None):
     deferred_fields = instance.get_deferred_fields()
 
     for field_name in get_fields_for_model(model_name, exclude=deferred_fields):
-        fieldfile = getattr(instance, field_name, None)
+        fieldfile = getattr(instance, field_name)
         yield field_name, fieldfile.__class__(using, fieldfile.field, fieldfile.name)
 
 
@@ -104,22 +103,26 @@ def get_field_storage(model_name, field_name):
 
 def get_dotted_path(object_):
     '''get the dotted path for an object'''
-    return DOTTED_PATH.format(klass=object_.__class__)
+    klass = object_.__class__
+    return f'{klass.__module__}.{klass.__qualname__}'
 
 
 def get_model_name(model):
     '''returns a unique model name'''
-    return '{opt.app_label}.{opt.model_name}'.format(opt=model._meta)
+    opt = model._meta
+    return f'{opt.app_label}.{opt.model_name}'
 
 
 def get_mangled_ignore(model):
     '''returns a mangled attribute name specific to the model for ignore functionality'''
-    return '_{opt.model_name}__{opt.app_label}_cleanup_ignore'.format(opt=model._meta)
+    opt = model._meta
+    return f'_{opt.model_name}__{opt.app_label}_cleanup_ignore'
 
 
 def get_mangled_select(model):
     '''returns a mangled attribute name specific to the model for select functionality'''
-    return '_{opt.model_name}__{opt.app_label}_cleanup_select'.format(opt=model._meta)
+    opt = model._meta
+    return f'_{opt.model_name}__{opt.app_label}_cleanup_select'
 
 
 # booleans ##
@@ -132,7 +135,8 @@ def model_has_filefields(model_name):
 
 def ignore_model(model, select_mode):
     '''Check if a model should be ignored'''
-    return (not hasattr(model, get_mangled_select(model))) if select_mode else hasattr(model, get_mangled_ignore(model))
+    return ((not hasattr(model, get_mangled_select(model)))
+        if select_mode else hasattr(model, get_mangled_ignore(model)))
 
 
 # instance functions ##

@@ -1,7 +1,8 @@
+import copy
 import os
 import shutil
 
-from django.conf import settings
+from django.conf import settings as django_settings
 from django.db.models.signals import post_delete, post_init, post_save, pre_save
 
 import pytest
@@ -11,29 +12,38 @@ from django_cleanup import cache, handlers
 from .testing_helpers import get_random_pic_name
 
 
-pytest_plugins = ("test.pytest_plugin",)
+pytest_plugins = ()
+
+def pytest_collection_modifyitems(items):
+    for item in items:
+        item.add_marker(pytest.mark.django_db(transaction=True))
 
 
 @pytest.fixture(autouse=True)
-def setup_django_cleanup_state(request):
+def setup_django_cleanup_state(request, settings):
     for model in cache.cleanup_models():
-        key = '{{}}_django_cleanup_{}'.format(cache.get_model_name(model))
+        suffix = f'_django_cleanup_{cache.get_model_name(model)}'
         post_init.disconnect(None, sender=model,
-                             dispatch_uid=key.format('post_init'))
+                             dispatch_uid=f'post_init{suffix}')
         pre_save.disconnect(None, sender=model,
-                            dispatch_uid=key.format('pre_save'))
+                            dispatch_uid=f'pre_save{suffix}')
         post_save.disconnect(None, sender=model,
-                             dispatch_uid=key.format('post_save'))
+                             dispatch_uid=f'post_save{suffix}')
         post_delete.disconnect(None, sender=model,
-                               dispatch_uid=key.format('post_delete'))
+                               dispatch_uid=f'post_delete{suffix}')
     cache.FIELDS.clear()
-    selectedConfig = any(m.name == 'CleanupSelectedConfig' for m in request.node.iter_markers())
-
-    cache.prepare(selectedConfig)
+    cache.prepare(request.node.get_closest_marker('cleanup_selected_config') is not None)
     handlers.connect()
 
+    stroage_marker = request.node.get_closest_marker('django_storage')
+    if stroage_marker is not None:
+        storages = copy.deepcopy(settings.STORAGES)
+        for key, value in stroage_marker.kwargs.items():
+            storages[key]['BACKEND'] = value
+        settings.STORAGES = storages
 
-@pytest.fixture(params=[settings.MEDIA_ROOT])
+
+@pytest.fixture(params=[django_settings.MEDIA_ROOT])
 def picture(request):
     src = os.path.join(request.param, 'pic.jpg')
     dst = os.path.join(request.param, get_random_pic_name())
