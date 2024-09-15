@@ -8,49 +8,20 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os || 'ubuntu-latest' }}
-    strategy:
-      matrix:
-        include:
-          - python: "3.8"
-            toxenv: py38-django42
-          - python: "3.9"
-            toxenv: py39-django42
-          - python: "3.10"
-            toxenv: py310-django42
-          - python: "3.11"
-            toxenv: py311-django42
-          - python: "3.12"
-            toxenv: py312-django42
-          - python: "pypy-3.10"
-            toxenv: pypy3-django42
-            
-          - python: "3.10"
-            toxenv: py310-django50
-          - python: "3.11"
-            toxenv: py311-django50
-          - python: "3.12"
-            toxenv: py312-django50
-          - python: "pypy-3.10"
-            toxenv: pypy3-django50
-
-          - python: "3.10"
-            toxenv: py310-django51
-          - python: "3.11"
-            toxenv: py311-django51
-          - python: "3.12"
-            toxenv: py312-django51
-          - python: "pypy-3.10"
-            toxenv: pypy3-django51
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python }}
+          python-version: |
+            3.8
+            3.9
+            3.10
+            pypy-3.10
+            3.11
+            3.12
       - name: Install Test Framework
-        run: pip install tox-gh-actions
+        run: pip install tox
       - name: Run Tests
-        env:
-          TOXENV: ${{ matrix.toxenv }}
-        run: tox # setting TOXENV is equivalent to calling `tox -e [ENV]`
+        run: tox r
