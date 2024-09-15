@@ -3,6 +3,4 @@ easy-thumbnails
 pillow
 pytest
 pytest-django
-pytest-pythonpath
 pytest-cov
-asgiref
