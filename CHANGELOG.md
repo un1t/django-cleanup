@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update to remove specific version references, since there haven't been significant changes the approach on versioning will change. The version will no longer update when only tests or supported versions are updated.
 - Updated lock thread version and update job to not run at contested times to avoid github rate limiting errors.
 - Updated ci build action versions.
+- Move isort and pytest settings to toml file.
+- Simplify tox.ini and github actions CI job.
+- Update a getattr call to remove unnecessary default of None so it will fail on an attribute error.
+- Change from .format() to f-strings.
 
 ### Removed
 - Removed setup.py/setup.cfg
