@@ -4,4 +4,4 @@
     will delete files on model instance deletion.
 '''
 
-__version__ = '9.0.0-dev'
+__version__ = '9.0.0'

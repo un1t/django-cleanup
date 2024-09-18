@@ -5,10 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-## [9.0.0] - TDB
+## [9.0.0] - 2024-09-18
 ## Added
 - pyproject.toml
-- Documentation on how to use transaction test case when using pytest. PR [#108] from [pavel-kalmykov](https://github.com/pavel-kalmykov).
+- Documentation on how to use transaction test case when using pytest. PR [#108] from [@pavel-kalmykov](https://github.com/pavel-kalmykov).
 
 ### Changed
 - Update to remove specific version references, since there haven't been significant changes the approach on versioning will change. The version will no longer update when only tests or supported versions are updated.
