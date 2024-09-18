@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name='django-cleanup'
+authors = [
+    {name = "Ilya Shalyapin", email = "ishalyapin@gmail.com"}
+]
+description = "Deletes old files."
+readme = "README.rst"
+keywords = ["django"]
+classifiers = [
+    'Development Status :: 5 - Production/Stable',
+    'Environment :: Web Environment',
+    'Framework :: Django',
+    'Intended Audience :: Developers',
+    'License :: OSI Approved :: MIT License',
+    'Operating System :: OS Independent',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: Implementation :: CPython',
+    'Programming Language :: Python :: Implementation :: PyPy',
+    'Topic :: Utilities'
+]
+requires-python = ">=3.8"
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/un1t/django-cleanup"
+Changelog = "https://github.com/un1t/django-cleanup/blob/master/CHANGELOG.md"
+
+[tool.setuptools.dynamic]
+version = {attr = "django_cleanup.__version__"}
+
+[tool.isort]
+sections = ["FUTURE", "STDLIB", "DJANGO", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+line_length = 100
+default_section = "THIRDPARTY"
+known_first_party = ["django_cleanup"]
+known_third_party = ["easy_thumbnails", "sorl", "pytest"]
+known_django = "django"
+multi_line_output = 4
+lines_after_imports = 2
+combine_as_imports = true
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "test.settings"
+pythonpath = [".", "src"]
+addopts = ["-v", "--cov-report=term-missing", "--cov=django_cleanup"]
+markers = [
+    "cleanup_selected_config: marks test as using the CleanupSelectedConfig app config",
+    "django_storage: change django storage backends"
+]

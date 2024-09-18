@@ -9,5 +9,5 @@ def get_using(instance):
 
 
 def get_random_pic_name(length=20):
-    return 'pic{}.jpg'.format(
-        ''.join(random.choice(string.ascii_letters) for m in range(length)))
+    random_str = ''.join(random.choice(string.ascii_letters) for m in range(length))
+    return f'pic{random_str}.jpg'

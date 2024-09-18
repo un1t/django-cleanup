@@ -2,7 +2,7 @@ name: 'Lock Threads'
 
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '25 4 * * *'
   workflow_dispatch:
 
 permissions:
@@ -16,7 +16,7 @@ jobs:
   action:
     runs-on: ubuntu-latest
     steps:
-      - uses: dessant/lock-threads@v3
+      - uses: dessant/lock-threads@v5
         with:
           issue-inactive-days: '30'
           issue-comment: >

@@ -4,8 +4,9 @@ import pickle
 import re
 import tempfile
 
-from django.conf import settings
+from django.conf import settings as django_settings
 from django.core.files import File
+from django.core.files.base import ContentFile
 from django.db import transaction
 from django.db.models.fields import NOT_PROVIDED, files
 
@@ -33,15 +34,18 @@ TB = '''Traceback (most recent call last):
 
 
 
-def getTraceback():
+def get_traceback(picture):
     fileabspath = os.path.abspath
     error = 'FileNotFoundError'
 
-    return TB.format(
-        handlers=fileabspath(handlers.__file__),
-        files=fileabspath(files.__file__),
-        storage=fileabspath(storage.__file__),
-        error=error)
+    return f'''Traceback (most recent call last):
+  File "{fileabspath(handlers.__file__)}", line xxx, in run_on_commit
+    file_.delete(save=False)
+  File "{fileabspath(files.__file__)}", line xxx, in delete
+    self.storage.delete(self.name)
+  File "{fileabspath(storage.__file__)}", line xxx, in delete
+    os.remove(name)
+{error}: [Errno 2] No such file or directory: '{picture}\''''
 
 
 def _raise(message):
@@ -50,7 +54,6 @@ def _raise(message):
     return _func
 
 
-@pytest.mark.django_db(transaction=True)
 def test_refresh_from_db_without_refresh(picture):
     product = Product.objects.create(image=picture['filename'])
     assert os.path.exists(picture['path'])
@@ -62,7 +65,6 @@ def test_refresh_from_db_without_refresh(picture):
     assert not os.path.exists(picture['path'])
 
 
-@pytest.mark.django_db(transaction=True)
 def test_cache_gone(picture):
     product = Product.objects.create(image=picture['filename'])
     assert os.path.exists(picture['path'])
@@ -73,7 +75,6 @@ def test_cache_gone(picture):
     assert not os.path.exists(picture['path'])
 
 
-@pytest.mark.django_db(transaction=True)
 def test_storage_gone(picture):
     product = Product.objects.create(image=picture['filename'])
     assert os.path.exists(picture['path'])
@@ -85,7 +86,6 @@ def test_storage_gone(picture):
     assert not os.path.exists(picture['path'])
 
 
-@pytest.mark.django_db(transaction=True)
 def test_replace_file_with_file(picture):
     product = Product.objects.create(image=picture['filename'])
     assert os.path.exists(picture['path'])
@@ -95,11 +95,10 @@ def test_replace_file_with_file(picture):
         product.save()
     assert not os.path.exists(picture['path'])
     assert product.image
-    new_image_path = os.path.join(settings.MEDIA_ROOT, random_pic_name)
+    new_image_path = os.path.join(django_settings.MEDIA_ROOT, random_pic_name)
     assert product.image.path == new_image_path
 
 
-@pytest.mark.django_db(transaction=True)
 def test_replace_file_with_blank(picture):
     product = Product.objects.create(image=picture['filename'])
     assert os.path.exists(picture['path'])
@@ -111,7 +110,6 @@ def test_replace_file_with_blank(picture):
     assert product.image.name == ''
 
 
-@pytest.mark.django_db(transaction=True)
 def test_replace_file_with_none(picture):
     product = Product.objects.create(image=picture['filename'])
     assert os.path.exists(picture['path'])
@@ -123,7 +121,6 @@ def test_replace_file_with_none(picture):
     assert product.image.name is None
 
 
-@pytest.mark.django_db(transaction=True)
 def test_replace_file_proxy(picture):
     product = ProductProxy.objects.create(image=picture['filename'])
     assert os.path.exists(picture['path'])
@@ -133,7 +130,6 @@ def test_replace_file_proxy(picture):
     assert not os.path.exists(picture['path'])
 
 
-@pytest.mark.django_db(transaction=True)
 def test_replace_file_unmanaged(picture):
     product = ProductUnmanaged.objects.create(image=picture['filename'])
     assert os.path.exists(picture['path'])
@@ -143,7 +139,6 @@ def test_replace_file_unmanaged(picture):
     assert not os.path.exists(picture['path'])
 
 
-@pytest.mark.django_db(transaction=True)
 def test_replace_file_deferred(picture):
     '''probably shouldn't save from a deferred model but someone might do it'''
     product = Product.objects.create(image=picture['filename'])
@@ -155,7 +150,6 @@ def test_replace_file_deferred(picture):
     assert not os.path.exists(picture['path'])
 
 
-@pytest.mark.django_db(transaction=True)
 def test_remove_model_instance(picture):
     product = Product.objects.create(image=picture['filename'])
     assert os.path.exists(picture['path'])
@@ -164,7 +158,6 @@ def test_remove_model_instance(picture):
     assert not os.path.exists(picture['path'])
 
 
-@pytest.mark.django_db(transaction=True)
 def test_remove_model_instance_default(picture):
     product = Product.objects.create()
     assert product.image_default.path == picture['srcpath']
@@ -175,7 +168,6 @@ def test_remove_model_instance_default(picture):
     assert os.path.exists(picture['srcpath'])
 
 
-@pytest.mark.django_db(transaction=True)
 def test_replace_file_with_file_default(picture):
     product = Product.objects.create()
     assert os.path.exists(picture['srcpath'])
@@ -188,7 +180,6 @@ def test_replace_file_with_file_default(picture):
     assert os.path.exists(picture['srcpath'])
 
 
-@pytest.mark.django_db(transaction=True)
 def test_remove_model_instance_ignore(picture):
     product = ProductIgnore.objects.create(image=picture['filename'])
     assert os.path.exists(picture['path'])
@@ -197,7 +188,6 @@ def test_remove_model_instance_ignore(picture):
     assert os.path.exists(picture['path'])
 
 
-@pytest.mark.django_db(transaction=True)
 def test_replace_file_with_file_ignore(picture):
     product = ProductIgnore.objects.create(image=picture['filename'])
     assert os.path.exists(picture['path'])
@@ -207,11 +197,10 @@ def test_replace_file_with_file_ignore(picture):
         product.save()
     assert os.path.exists(picture['path'])
     assert product.image
-    new_image_path = os.path.join(settings.MEDIA_ROOT, random_pic_name)
+    new_image_path = os.path.join(django_settings.MEDIA_ROOT, random_pic_name)
     assert product.image.path == new_image_path
 
 
-@pytest.mark.django_db(transaction=True)
 def test_remove_model_instance_proxy(picture):
     product = ProductProxy.objects.create(image=picture['filename'])
     assert os.path.exists(picture['path'])
@@ -220,7 +209,6 @@ def test_remove_model_instance_proxy(picture):
     assert not os.path.exists(picture['path'])
 
 
-@pytest.mark.django_db(transaction=True)
 def test_remove_model_instance_unmanaged(picture):
     product = ProductUnmanaged.objects.create(image=picture['filename'])
     assert os.path.exists(picture['path'])
@@ -229,7 +217,6 @@ def test_remove_model_instance_unmanaged(picture):
     assert not os.path.exists(picture['path'])
 
 
-@pytest.mark.django_db(transaction=True)
 def test_remove_model_instance_deferred(picture):
     product = Product.objects.create(image=picture['filename'])
     assert os.path.exists(picture['path'])
@@ -239,7 +226,6 @@ def test_remove_model_instance_deferred(picture):
     assert not os.path.exists(picture['path'])
 
 
-@pytest.mark.django_db(transaction=True)
 def test_remove_blank_file(monkeypatch):
     product = Product.objects.create(image='')
     monkeypatch.setattr(
@@ -250,14 +236,12 @@ def test_remove_blank_file(monkeypatch):
         product.delete()
 
 
-@pytest.mark.django_db(transaction=True)
 def test_remove_not_exists():
     product = Product.objects.create(image='no-such-file')
     with transaction.atomic(get_using(product)):
         product.delete()
 
 
-@pytest.mark.django_db(transaction=True)
 def test_remove_none(monkeypatch):
     product = Product.objects.create(image=None)
     monkeypatch.setattr(
@@ -268,10 +252,10 @@ def test_remove_none(monkeypatch):
         product.delete()
 
 
-@pytest.mark.django_db(transaction=True)
-def test_exception_on_save(settings, picture, caplog):
-    settings.DEFAULT_FILE_STORAGE = 'test.storage.DeleteErrorStorage'
-    product = Product.objects.create(image=picture['filename'])
+@pytest.mark.django_storage(default='test.storage.DeleteErrorStorage')
+def test_exception_on_save(picture, caplog):
+    filename = picture['filename']
+    product = Product.objects.create(image=filename)
     # simulate a fieldfile that has a storage that raises a filenotfounderror on delete
     assert os.path.exists(picture['path'])
     product.image.delete(save=False)
@@ -282,18 +266,16 @@ def test_exception_on_save(settings, picture, caplog):
     assert not os.path.exists(picture['path'])
 
     for record in caplog.records:
-        assert LINE.sub('line xxx', record.exc_text) == getTraceback().format(picture=picture['path'])
+        assert LINE.sub('line xxx', record.exc_text) == get_traceback(picture['path'])
     assert caplog.record_tuples == [
         (
             'django_cleanup.handlers',
             logging.ERROR,
-            'There was an exception deleting the file `{}` on field `test.product.image`'.format(
-                picture['filename'])
+            f'There was an exception deleting the file `{filename}` on field `test.product.image`'
         )
     ]
 
 
-@pytest.mark.django_db(transaction=True)
 def test_cascade_delete(picture):
     root = RootProduct.objects.create()
     branch = BranchProduct.objects.create(root=root, image=picture['filename'])
@@ -304,7 +286,6 @@ def test_cascade_delete(picture):
     assert not os.path.exists(picture['path'])
 
 
-@pytest.mark.django_db(transaction=True)
 def test_file_exists_on_create_and_update():
     # If a filepath is specified which already exists,
     # the FileField generates a random suffix to choose a different location.
@@ -314,7 +295,7 @@ def test_file_exists_on_create_and_update():
     # directly within the same directory as the image would be uploaded to.
 
     upload_to = Product._meta.get_field("image").upload_to
-    dst_directory = os.path.join(settings.MEDIA_ROOT, upload_to)
+    dst_directory = os.path.join(django_settings.MEDIA_ROOT, upload_to)
     if not os.path.isdir(dst_directory):
         os.makedirs(dst_directory)
 
@@ -322,7 +303,8 @@ def test_file_exists_on_create_and_update():
     # a file aleady exists so the new file is renamed then saved
     with tempfile.NamedTemporaryFile(prefix="f1__", dir=dst_directory) as f1:
         with transaction.atomic():
-            product = Product.objects.create(image=File(f1, name=os.path.join(upload_to, os.path.basename(f1.name))))
+            product = Product.objects.create(
+                image=File(f1, name=os.path.join(upload_to, os.path.basename(f1.name))))
 
         assert f1.name != product.image.path
         assert os.path.exists(f1.name)
@@ -353,10 +335,9 @@ def test_file_exists_on_create_and_update():
             assert not os.path.isfile(product.image.path)
 
 
-@pytest.mark.django_db(transaction=True)
 def test_signals(picture):
-    prekwargs = None
-    postkwargs = None
+    prekwargs = {}
+    postkwargs = {}
     def assn_prekwargs(**kwargs):
         nonlocal prekwargs
         prekwargs = kwargs
@@ -364,56 +345,59 @@ def test_signals(picture):
     def assn_postkwargs(**kwargs):
         nonlocal postkwargs
         postkwargs = kwargs
-    
-    cleanup_pre_delete.connect(assn_prekwargs, dispatch_uid='pre_test_replace_file_with_file_signals')
-    cleanup_post_delete.connect(assn_postkwargs, dispatch_uid='post_test_replace_file_with_file_signals')
+
+    cleanup_pre_delete.connect(
+        assn_prekwargs, dispatch_uid='pre_test_replace_file_with_file_signals')
+    cleanup_post_delete.connect(
+        assn_postkwargs, dispatch_uid='post_test_replace_file_with_file_signals')
     product = Product.objects.create(image=picture['filename'])
     random_pic_name = get_random_pic_name()
     product.image = random_pic_name
     with transaction.atomic(get_using(product)):
         product.save()
 
-    assert prekwargs['deleted'] == False
-    assert prekwargs['updated'] == True
+    assert prekwargs['deleted'] is False
+    assert prekwargs['updated'] is True
     assert prekwargs['instance'] == product
     assert prekwargs['file'] is not None
     assert prekwargs['file_name'] == picture['filename']
-    assert isinstance(prekwargs['default_file_name'], NOT_PROVIDED) 
+    assert isinstance(prekwargs['default_file_name'], NOT_PROVIDED)
     assert prekwargs['model_name'] == 'test.product'
     assert prekwargs['field_name'] == 'image'
-    
-    assert postkwargs['deleted'] == False
-    assert postkwargs['updated'] == True
+
+    assert postkwargs['deleted'] is False
+    assert postkwargs['updated'] is True
     assert postkwargs['instance'] == product
     assert postkwargs['file'] is not None
     assert postkwargs['file_name'] == picture['filename']
-    assert isinstance(postkwargs['default_file_name'], NOT_PROVIDED) 
+    assert isinstance(postkwargs['default_file_name'], NOT_PROVIDED)
     assert postkwargs['model_name'] == 'test.product'
     assert postkwargs['field_name'] == 'image'
-    assert postkwargs['success'] == True
+    assert postkwargs['success'] is True
     assert postkwargs['error'] is None
 
     with transaction.atomic(get_using(product)):
         product.delete()
 
-    assert prekwargs['deleted'] == True
-    assert prekwargs['updated'] == False
+    assert prekwargs['deleted'] is True
+    assert prekwargs['updated'] is False
     assert prekwargs['instance'] == product
     assert prekwargs['file'] is not None
     assert prekwargs['file_name'] == random_pic_name
-    assert isinstance(prekwargs['default_file_name'], NOT_PROVIDED) 
+    assert isinstance(prekwargs['default_file_name'], NOT_PROVIDED)
     assert prekwargs['model_name'] == 'test.product'
     assert prekwargs['field_name'] == 'image'
-    
-    assert postkwargs['deleted'] == True
-    assert postkwargs['updated'] == False
+
+    assert postkwargs['deleted'] is True
+    assert postkwargs['updated'] is False
     assert postkwargs['instance'] == product
     assert postkwargs['file'] is not None
     assert postkwargs['file_name'] == random_pic_name
-    assert isinstance(postkwargs['default_file_name'], NOT_PROVIDED) 
+    assert isinstance(postkwargs['default_file_name'], NOT_PROVIDED)
     assert postkwargs['model_name'] == 'test.product'
     assert postkwargs['field_name'] == 'image'
-    assert postkwargs['success'] == True
+    print(postkwargs['error'])
+    assert postkwargs['success'] is True
     assert postkwargs['error'] is None
 
     cleanup_pre_delete.disconnect(None, dispatch_uid='pre_test_replace_file_with_file_signals')
@@ -421,8 +405,7 @@ def test_signals(picture):
 
 
 #region select config
-@pytest.mark.CleanupSelectedConfig
-@pytest.mark.django_db(transaction=True)
+@pytest.mark.cleanup_selected_config
 def test__select_config__replace_file_with_file(picture):
     product = Product.objects.create(image=picture['filename'])
     assert os.path.exists(picture['path'])
@@ -432,12 +415,11 @@ def test__select_config__replace_file_with_file(picture):
         product.save()
     assert not os.path.exists(picture['path'])
     assert product.image
-    new_image_path = os.path.join(settings.MEDIA_ROOT, random_pic_name)
+    new_image_path = os.path.join(django_settings.MEDIA_ROOT, random_pic_name)
     assert product.image.path == new_image_path
 
 
-@pytest.mark.CleanupSelectedConfig
-@pytest.mark.django_db(transaction=True)
+@pytest.mark.cleanup_selected_config
 def test__select_config__replace_file_with_file_ignore(picture):
     product = ProductIgnore.objects.create(image=picture['filename'])
     assert os.path.exists(picture['path'])
@@ -447,6 +429,6 @@ def test__select_config__replace_file_with_file_ignore(picture):
         product.save()
     assert os.path.exists(picture['path'])
     assert product.image
-    new_image_path = os.path.join(settings.MEDIA_ROOT, random_pic_name)
+    new_image_path = os.path.join(django_settings.MEDIA_ROOT, random_pic_name)
     assert product.image.path == new_image_path
 #endregion

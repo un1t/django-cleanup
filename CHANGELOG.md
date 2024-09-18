@@ -5,6 +5,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+## [9.0.0] - 2024-09-18
+## Added
+- pyproject.toml
+- Documentation on how to use transaction test case when using pytest. PR [#108] from [@pavel-kalmykov](https://github.com/pavel-kalmykov).
+
+### Changed
+- Update to remove specific version references, since there haven't been significant changes the approach on versioning will change. The version will no longer update when only tests or supported versions are updated.
+- Updated lock thread version and update job to not run at contested times to avoid github rate limiting errors.
+- Updated ci build action versions.
+- Move isort and pytest settings to toml file.
+- Simplify tox.ini and github actions CI job.
+- Update a getattr call to remove unnecessary default of None so it will fail on an attribute error.
+- Change from .format() to f-strings.
+
+### Removed
+- Removed setup.py/setup.cfg
+
 ## [8.1.0] - 2024-01-28
 ### Added
 - Run tests for django 5.0 and python 3.12.
@@ -93,7 +110,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.4] - 2012-08-16
 ## [0.1.0] - 2012-08-14
 
-[Unreleased]: https://github.com/un1t/django-cleanup/compare/8.1.0...HEAD
+[Unreleased]: https://github.com/un1t/django-cleanup/compare/9.0.0...HEAD
+[9.0.0]: https://github.com/un1t/django-cleanup/compare/8.1.0...9.0.0
 [8.1.0]: https://github.com/un1t/django-cleanup/compare/8.0.0...8.1.0
 [8.0.0]: https://github.com/un1t/django-cleanup/compare/7.0.0...8.0.0
 [7.0.0]: https://github.com/un1t/django-cleanup/compare/6.0.0...7.0.0
@@ -131,6 +149,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.1.4]: https://github.com/un1t/django-cleanup/compare/0.1.0...0.1.4
 [0.1.0]: https://github.com/un1t/django-cleanup/releases/tag/0.1.0
 
+[#108]: https://github.com/un1t/django-cleanup/pull/108
 [#100]: https://github.com/un1t/django-cleanup/pull/100
 [#98]: https://github.com/un1t/django-cleanup/issues/98
 [#96]: https://github.com/un1t/django-cleanup/issues/96

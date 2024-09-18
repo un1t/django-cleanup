@@ -123,12 +123,12 @@ def delete_file(sender, instance, field_name, file_, using, reason):
 def connect():
     '''Connect signals to the cleanup models'''
     for model in cache.cleanup_models():
-        key = '{{}}_django_cleanup_{}'.format(cache.get_model_name(model))
+        suffix = f'_django_cleanup_{cache.get_model_name(model)}'
         post_init.connect(cache_original_post_init, sender=model,
-                          dispatch_uid=key.format('post_init'))
+                          dispatch_uid=f'post_init{suffix}')
         pre_save.connect(fallback_pre_save, sender=model,
-                         dispatch_uid=key.format('pre_save'))
+                         dispatch_uid=f'pre_save{suffix}')
         post_save.connect(delete_old_post_save, sender=model,
-                          dispatch_uid=key.format('post_save'))
+                          dispatch_uid=f'post_save{suffix}')
         post_delete.connect(delete_all_post_delete, sender=model,
-                            dispatch_uid=key.format('post_delete'))
+                            dispatch_uid=f'post_delete{suffix}')

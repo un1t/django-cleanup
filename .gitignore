@@ -12,3 +12,4 @@ env/*
 .vscode/*
 README.html
 *.txt
+.venv/*

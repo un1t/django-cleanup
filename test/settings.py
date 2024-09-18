@@ -30,9 +30,9 @@ except ImportError:
 except (django.core.exceptions.AppRegistryNotReady, django.core.exceptions.ImproperlyConfigured):
     INSTALLED_APPS = INSTALLED_APPS + INSTALLED_APPS_INTEGRATION
 
-
 MIDDLEWARE_CLASSES = []
-
 SECRET_KEY = '123'
-
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+## workaround: https://github.com/SmileyChris/easy-thumbnails/issues/641#issuecomment-2291098096
+THUMBNAIL_DEFAULT_STORAGE_ALIAS = 'default'
