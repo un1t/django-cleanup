@@ -157,6 +157,21 @@ mark a model for cleanup:
     class MyModel(models.Model):
         image = models.FileField()
 
+Only cleanup selected fields
+----------------------------
+If you prefer to explicitly configure which fields django-cleanup will handle, you can use the :code:`CLEANUP` setting in your settings.py:
+
+.. code-block:: py
+
+    CLEANUP = {
+        'model.name': {'field1', 'field2'},  # Only clean these fields for this model
+        'other.model': {'field3'}  # Only clean field3 for other.model
+    }
+
+The setting maps model names (in the format "app_label.model_name") to sets of field names that should be cleaned up.
+
+Note that if :code:`CLEANUP` is set and a model or field is not included in the :code:`CLEANUP` setting, its files will not be cleaned up.
+
 How to run tests
 ================
 Install, setup and use pyenv_ to install all the required versions of cPython

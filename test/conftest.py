@@ -21,6 +21,9 @@ def pytest_collection_modifyitems(items):
 
 @pytest.fixture(autouse=True)
 def setup_django_cleanup_state(request, settings):
+    settings_marker = request.node.get_closest_marker("cleanup_settings")
+    settings.CLEANUP = settings_marker.args[0] if settings_marker else None
+
     for model in cache.cleanup_models():
         suffix = f'_django_cleanup_{cache.get_model_name(model)}'
         post_init.disconnect(None, sender=model,

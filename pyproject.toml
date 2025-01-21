@@ -49,5 +49,6 @@ pythonpath = [".", "src"]
 addopts = ["-v", "--cov-report=term-missing", "--cov=django_cleanup"]
 markers = [
     "cleanup_selected_config: marks test as using the CleanupSelectedConfig app config",
+    "cleanup_settings: marks test as using the CLEANUP django setting",
     "django_storage: change django storage backends"
 ]

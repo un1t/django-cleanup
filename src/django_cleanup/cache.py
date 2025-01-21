@@ -2,6 +2,7 @@
 from collections import defaultdict
 
 from django.apps import apps
+from django.conf import settings
 from django.db import models
 from django.utils.module_loading import import_string
 
@@ -28,6 +29,7 @@ def prepare(select_mode):
     if FIELDS:  # pragma: no cover
         return
 
+    config = getattr(settings, "CLEANUP", {})
     for model in apps.get_models():
         if ignore_model(model, select_mode):
             continue
@@ -36,8 +38,11 @@ def prepare(select_mode):
             continue
         opts = model._meta
         for field in opts.get_fields():
-            if isinstance(field, models.FileField):
-                add_field_for_model(name, field.name, field)
+            if not isinstance(field, models.FileField):
+                continue
+            if config and field.name not in config.get(name, []):
+                continue
+            add_field_for_model(name, field.name, field)
 
 
 def add_field_for_model(model_name, field_name, field):

@@ -432,3 +432,47 @@ def test__select_config__replace_file_with_file_ignore(picture):
     new_image_path = os.path.join(django_settings.MEDIA_ROOT, random_pic_name)
     assert product.image.path == new_image_path
 #endregion
+
+
+#region cleanup settings
+@pytest.mark.cleanup_settings({'test.product': {'image'}})
+def test_cleanup_settings_model_included(picture):
+    product = Product.objects.create(image=picture['filename'])
+    assert os.path.exists(picture['path'])
+    random_pic_name = get_random_pic_name()
+    product.image = random_pic_name
+    with transaction.atomic(get_using(product)):
+        product.save()
+    assert not os.path.exists(picture['path'])
+    assert product.image
+    new_image_path = os.path.join(django_settings.MEDIA_ROOT, random_pic_name)
+    assert product.image.path == new_image_path
+
+
+@pytest.mark.cleanup_settings({'test.other_model': {'image'}})
+def test_cleanup_settings_model_excluded(picture):
+    product = Product.objects.create(image=picture['filename'])
+    assert os.path.exists(picture['path'])
+    random_pic_name = get_random_pic_name()
+    product.image = random_pic_name
+    with transaction.atomic(get_using(product)):
+        product.save()
+    assert os.path.exists(picture['path'])  # File should not be cleaned up
+    assert product.image
+    new_image_path = os.path.join(django_settings.MEDIA_ROOT, random_pic_name)
+    assert product.image.path == new_image_path
+
+
+@pytest.mark.cleanup_settings({'test.product': {'other_field'}})
+def test_cleanup_settings_field_excluded(picture):
+    product = Product.objects.create(image=picture['filename'])
+    assert os.path.exists(picture['path'])
+    random_pic_name = get_random_pic_name()
+    product.image = random_pic_name
+    with transaction.atomic(get_using(product)):
+        product.save()
+    assert os.path.exists(picture['path'])  # File should not be cleaned up
+    assert product.image
+    new_image_path = os.path.join(django_settings.MEDIA_ROOT, random_pic_name)
+    assert product.image.path == new_image_path
+#endregion
