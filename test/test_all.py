@@ -2,6 +2,7 @@ import logging
 import os
 import pickle
 import re
+import sys
 import tempfile
 
 from django.conf import settings as django_settings
@@ -23,7 +24,8 @@ from .testing_helpers import get_random_pic_name, get_using
 
 LINE = re.compile(r'line \d{1,3}')
 
-TB = '''Traceback (most recent call last):
+if sys.version_info < (3, 13):
+    TB = '''Traceback (most recent call last):
   File "{handlers}", line xxx, in run_on_commit
     file_.delete(save=False)
   File "{files}", line xxx, in delete
@@ -31,6 +33,8 @@ TB = '''Traceback (most recent call last):
   File "{storage}", line xxx, in delete
     os.remove(name)
 {error}: [Errno 2] No such file or directory: '{{picture}}\''''
+else:
+    TB = ''''''
 
 
 
